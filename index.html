@@ -1,0 +1,2114 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MONEY MOMENTUM SIMULATOR</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Alex+Brush&display=swap');
+
+    :root {
+      --bg-blush: #F8E1D9;
+      --soft-peach: #EBC7B9;
+      --deep-plum: #5A1730;
+      --dusty-mauve: #936164;
+      --antique-gold: #B68A55;
+      --champagne-gold: #D5B3A9;
+      --muted-berry: #794456;
+      --sage-green: #527A52;
+      --sage-bg: #E8F0E8;
+      --card-bg: #FFFDFB;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-blush);
+      color: var(--deep-plum);
+      overflow-x: hidden;
+      touch-action: manipulation;
+    }
+
+    h1, h2, h3, h4, .serif-heading {
+      font-family: 'Playfair Display', serif;
+    }
+
+    .brand-script {
+      font-family: 'Alex Brush', cursive;
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(235, 199, 185, 0.3);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--dusty-mauve);
+      border-radius: 999px;
+    }
+
+    /* Gold Linework & Premium Card Styling */
+    .momentum-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(182, 138, 85, 0.25);
+      box-shadow: 0 12px 32px -8px rgba(90, 23, 48, 0.06), 0 4px 12px -2px rgba(182, 138, 85, 0.12);
+      border-radius: 1.5rem;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .momentum-card:hover {
+      box-shadow: 0 18px 40px -6px rgba(90, 23, 48, 0.09), 0 6px 20px -2px rgba(182, 138, 85, 0.2);
+    }
+
+    /* Sliders Styling with Touch-Friendly Handles */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+      padding: 10px 0;
+    }
+    input[type=range]:focus {
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 10px;
+      cursor: pointer;
+      background: linear-gradient(90deg, #EBC7B9, #D5B3A9);
+      border-radius: 999px;
+      border: 1px solid rgba(182, 138, 85, 0.3);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      height: 32px;
+      width: 32px;
+      border-radius: 50%;
+      background: var(--deep-plum);
+      border: 3px solid var(--antique-gold);
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -11px;
+      box-shadow: 0 4px 12px rgba(90, 23, 48, 0.35);
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:active, input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.18);
+      background: var(--muted-berry);
+    }
+
+    /* Pot Animated Liquid Fill */
+    .pot-liquid {
+      transition: width 0.5s cubic-bezier(0.34, 1.2, 0.64, 1), background-color 0.4s ease;
+      background: linear-gradient(90deg, rgba(182, 138, 85, 0.65) 0%, rgba(90, 23, 48, 0.9) 100%);
+    }
+
+    /* Botanical Background Pattern SVG Overlay */
+    .bg-botanical-pattern {
+      background-image: radial-gradient(#B68A55 0.8px, transparent 0.8px), radial-gradient(#B68A55 0.8px, #F8E1D9 0.8px);
+      background-size: 32px 32px;
+      background-position: 0 0, 16px 16px;
+      opacity: 0.12;
+    }
+
+    /* Floating SVG Botanical Watermark */
+    .botanical-leaf {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0.15;
+      fill: var(--antique-gold);
+      z-index: 0;
+    }
+
+    /* Pulse Glow for Live Stats */
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 15px rgba(182, 138, 85, 0.2); }
+      50% { box-shadow: 0 0 25px rgba(182, 138, 85, 0.45); }
+    }
+    .gold-glow {
+      animation: pulse-glow 4s infinite ease-in-out;
+    }
+
+    /* Money Draggable Bubbles */
+    .money-bubble {
+      cursor: grab;
+      user-select: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .money-bubble:active {
+      cursor: grabbing;
+      transform: scale(1.1);
+    }
+
+    .pot-drop-zone.drag-over {
+      border-color: #5A1730 !important;
+      background-color: rgba(235, 199, 185, 0.4) !important;
+      transform: scale(1.02);
+    }
+
+    /* Mobile Bottom Sheet Animations */
+    .bottom-sheet {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between text-slate-800 relative bg-[#F8E1D9]">
+
+  <!-- Botanical Decorative Background Patterns -->
+  <div class="fixed inset-0 bg-botanical-pattern pointer-events-none z-0"></div>
+
+  <!-- Subtle Botanical SVG Corner Watermarks -->
+  <svg class="botanical-leaf top-2 left-2 w-48 h-48 hidden md:block" viewBox="0 0 100 100">
+    <path d="M30,90 Q50,50 90,20 Q60,40 30,90 Z" />
+    <path d="M40,70 Q20,50 10,30 Q30,40 40,70 Z" />
+    <path d="M60,50 Q40,30 30,10 Q50,20 60,50 Z" />
+  </svg>
+
+  <svg class="botanical-leaf bottom-2 right-2 w-56 h-56 hidden md:block rotate-180" viewBox="0 0 100 100">
+    <path d="M30,90 Q50,50 90,20 Q60,40 30,90 Z" />
+    <path d="M40,70 Q20,50 10,30 Q30,40 40,70 Z" />
+    <path d="M60,50 Q40,30 30,10 Q50,20 60,50 Z" />
+  </svg>
+
+  <!-- Main Container -->
+  <div class="relative z-10 flex-grow flex flex-col max-w-5xl mx-auto w-full px-4 sm:px-6 py-4">
+
+    <!-- Header / Brand Bar -->
+    <header class="flex items-center justify-between py-3 mb-3 border-b border-[#EBC7B9]">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="goToStep(1)">
+        <div class="w-11 h-11 rounded-full bg-[#5A1730] flex items-center justify-center text-amber-200 font-serif font-bold text-lg shadow-md border-2 border-[#B68A55]">
+          MM
+        </div>
+        <div>
+          <div class="tracking-widest text-xs font-bold text-[#5A1730] uppercase">MONEY MOMENTUM</div>
+          <div class="brand-script text-xl text-[#B68A55] -mt-1 font-medium">by Mariam</div>
+        </div>
+      </div>
+
+      <!-- Step Counter & Header Progress Bar -->
+      <div id="header-progress-container" class="flex items-center space-x-3 text-xs font-semibold text-[#794456]">
+        <span class="hidden sm:inline">Step <span id="current-step-num">1</span> of 7</span>
+        <div class="w-24 sm:w-32 bg-[#EBC7B9] h-2.5 rounded-full overflow-hidden border border-[#B68A55]/30">
+          <div id="header-progress-bar" class="bg-[#5A1730] h-full transition-all duration-300" style="width: 14%;"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Visual Top Progress Bar for Mobile -->
+    <div id="top-progress-bar-wrap" class="w-full bg-[#EBC7B9]/40 h-1.5 rounded-full mb-4 overflow-hidden hidden">
+      <div id="main-progress-bar" class="bg-[#5A1730] h-full transition-all duration-500" style="width: 14%"></div>
+    </div>
+
+    <!-- MAIN INTERACTIVE VIEWPORT -->
+    <main id="app-viewport" class="flex-grow relative flex flex-col justify-center">
+
+      <!-- STEP 1: WELCOME SCREEN -->
+      <section id="step-1" class="step-view space-y-8 my-auto py-4">
+        <div class="text-center max-w-2xl mx-auto space-y-3">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#EBC7B9]/50 border border-[#B68A55]/40 text-xs text-[#5A1730] font-semibold">
+            <span>✨</span> Educational Financial Planning Simulator
+          </div>
+          <h1 class="text-4xl sm:text-5xl md:text-6xl font-serif font-bold text-[#5A1730] leading-tight">
+            See what your money could make possible.
+          </h1>
+          <p class="text-base sm:text-lg text-[#794456] leading-relaxed font-light max-w-xl mx-auto">
+            Explore possible money paths, understand the trade-offs, and choose your next move with clarity and confidence.
+          </p>
+        </div>
+
+        <!-- Hero Card -->
+        <div class="momentum-card p-6 sm:p-10 max-w-xl mx-auto text-center relative overflow-hidden bg-gradient-to-br from-[#FFFDFB] via-[#FFFDFB] to-[#F8E1D9] border-2 border-[#B68A55]/30">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#5A1730]/10 flex items-center justify-center text-3xl border border-[#B68A55]/30">
+            🌱
+          </div>
+          <h2 class="text-2xl font-serif font-bold text-[#5A1730] mb-2">Build Wealth. Grow Your Confidence. Create Your Freedom.</h2>
+          <p class="text-xs sm:text-sm text-[#936164] mb-6 leading-relaxed">
+            A serene, zero-pressure space designed to help you simulate choices, stress-test real scenarios, and balance security with growth.
+          </p>
+          <button onclick="goToStep(2)" class="w-full sm:w-auto px-10 py-4 bg-[#5A1730] hover:bg-[#794456] text-white font-semibold rounded-2xl shadow-lg shadow-[#5A1730]/20 transition-all hover:scale-[1.02] active:scale-[0.98] border border-[#B68A55] text-sm">
+            Build My Plan →
+          </button>
+        </div>
+
+        <div class="text-center max-w-md mx-auto">
+          <p class="text-[11px] text-[#936164] leading-relaxed italic">
+            <strong>Educational Disclaimer:</strong> For education and illustration only. Not financial advice. Does not tell you what to buy, sell, or invest in. Values can go down as well as up.
+          </p>
+        </div>
+      </section>
+
+      <!-- STEP 2: CHOOSE A GOAL -->
+      <section id="step-2" class="step-view hidden space-y-6 py-2">
+        <div class="text-center max-w-2xl mx-auto space-y-1">
+          <span class="text-xs uppercase tracking-widest text-[#B68A55] font-bold">Step 1 of 5</span>
+          <h2 class="text-3xl sm:text-4xl font-serif font-bold text-[#5A1730]">Choose Your Priority Goal</h2>
+          <p class="text-xs sm:text-sm text-[#794456]">Select what you are working towards. You can fully customize target and timeline.</p>
+        </div>
+
+        <!-- Goal Selection Cards Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-4xl mx-auto">
+          <button onclick="selectGoal('Holiday or Purchase', 1000, 3, '🌴', 'short')" class="goal-card momentum-card p-3.5 text-left flex flex-col justify-between h-32 hover:border-[#B68A55] border-2 border-transparent transition-all">
+            <span class="text-2xl">🌴</span>
+            <div>
+              <div class="text-[10px] text-[#936164] uppercase font-bold">Short-Term</div>
+              <div class="font-bold text-xs text-[#5A1730]">£1,000 Holiday</div>
+            </div>
+          </button>
+
+          <button onclick="selectGoal('Emergency Fund', 3000, 6, '🛡️', 'short')" class="goal-card momentum-card p-3.5 text-left flex flex-col justify-between h-32 hover:border-[#B68A55] border-2 border-transparent transition-all">
+            <span class="text-2xl">🛡️</span>
+            <div>
+              <div class="text-[10px] text-[#936164] uppercase font-bold">Security</div>
+              <div class="font-bold text-xs text-[#5A1730]">Emergency Fund</div>
+            </div>
+          </button>
+
+          <button onclick="selectGoal('Clear Debt', 5000, 12, '🕊️', 'short')" class="goal-card momentum-card p-3.5 text-left flex flex-col justify-between h-32 hover:border-[#B68A55] border-2 border-transparent transition-all">
+            <span class="text-2xl">🕊️</span>
+            <div>
+              <div class="text-[10px] text-[#936164] uppercase font-bold">Freedom</div>
+              <div class="font-bold text-xs text-[#5A1730]">Clear Debt</div>
+            </div>
+          </button>
+
+          <button onclick="selectGoal('Education & Learning', 4000, 12, '🎓', 'medium')" class="goal-card momentum-card p-3.5 text-left flex flex-col justify-between h-32 hover:border-[#B68A55] border-2 border-transparent transition-all">
+            <span class="text-2xl">🎓</span>
+            <div>
+              <div class="text-[10px] text-[#936164] uppercase font-bold">Growth</div>
+              <div class="font-bold text-xs text-[#5A1730]">University / Education</div>
+            </div>
+          </button>
+
+          <button onclick="selectGoal('House Deposit', 25000, 36, '🏡', 'medium')" class="goal-card momentum-card p-3.5 text-left flex flex-col justify-between h-32 hover:border-[#B68A55] border-2 border-transparent transition-all">
+            <span class="text-2xl">🏡</span>
+            <div>
+              <div class="text-[10px] text-[#936164] uppercase font-bold">Medium-Term</div>
+              <div class="font-bold text-xs text-[#5A1730]">House Deposit</div>
+            </div>
+          </button>
+
+          <button onclick="selectGoal('Start a Business', 15000, 24, '🚀', 'medium')" class="goal-card momentum-card p-3.5 text-left flex flex-col justify-between h-32 hover:border-[#B68A55] border-2 border-transparent transition-all">
+            <span class="text-2xl">🚀</span>
+            <div>
+              <div class="text-[10px] text-[#936164] uppercase font-bold">Venture</div>
+              <div class="font-bold text-xs text-[#5A1730]">Start a Business</div>
+            </div>
+          </button>
+
+          <button onclick="selectGoal('Build Wealth', 50000, 60, '💎', 'long')" class="goal-card momentum-card p-3.5 text-left flex flex-col justify-between h-32 hover:border-[#B68A55] border-2 border-transparent transition-all">
+            <span class="text-2xl">💎</span>
+            <div>
+              <div class="text-[10px] text-[#936164] uppercase font-bold">Long-Term</div>
+              <div class="font-bold text-xs text-[#5A1730]">Build Wealth</div>
+            </div>
+          </button>
+
+          <button onclick="selectGoal('Retirement Freedom', 100000, 120, '🌅', 'long')" class="goal-card momentum-card p-3.5 text-left flex flex-col justify-between h-32 hover:border-[#B68A55] border-2 border-transparent transition-all">
+            <span class="text-2xl">🌅</span>
+            <div>
+              <div class="text-[10px] text-[#936164] uppercase font-bold">Future</div>
+              <div class="font-bold text-xs text-[#5A1730]">Retirement</div>
+            </div>
+          </button>
+        </div>
+
+        <!-- Custom Goal Customizer Card -->
+        <div id="goal-customizer" class="momentum-card p-5 sm:p-6 max-w-2xl mx-auto space-y-5">
+          <div class="flex items-center justify-between border-b border-[#EBC7B9] pb-3">
+            <div class="flex items-center space-x-3">
+              <span id="custom-goal-icon" class="text-3xl">🎯</span>
+              <div>
+                <label class="text-[10px] font-bold text-[#936164] uppercase tracking-wider">Goal Title</label>
+                <input type="text" id="goal-title-input" value="Build Long-Term Wealth" oninput="updateGoalFromInputs()" class="text-lg font-serif font-bold text-[#5A1730] bg-transparent border-b border-dashed border-[#B68A55] focus:outline-none w-full">
+              </div>
+            </div>
+            <!-- Horizon Mode Badge -->
+            <span id="time-horizon-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-[#5A1730] text-amber-100 flex items-center gap-1.5">
+              <span id="horizon-badge-icon">💎</span> <span id="horizon-badge-text">Long-Term Growth</span>
+            </span>
+          </div>
+
+          <!-- Target Amount Slider -->
+          <div class="space-y-1">
+            <div class="flex justify-between items-center">
+              <label class="text-xs font-bold text-[#5A1730]">How much do you need?</label>
+              <div class="flex items-center font-serif text-2xl font-bold text-[#5A1730] bg-[#F8E1D9]/60 px-3 py-1 rounded-xl border border-[#B68A55]/30">
+                <span>£</span>
+                <input type="number" id="goal-amount-input" value="50000" step="500" oninput="syncGoalAmountSlider()" class="w-28 bg-transparent text-right focus:outline-none ml-1">
+              </div>
+            </div>
+            <input type="range" id="goal-amount-slider" min="500" max="250000" step="500" value="50000" oninput="syncGoalAmountInput()">
+            <div class="flex justify-between text-[10px] text-[#936164] font-medium">
+              <span>£500</span>
+              <span>£100,000</span>
+              <span>£250,000+</span>
+            </div>
+          </div>
+
+          <!-- Timeline Slider -->
+          <div class="space-y-1">
+            <div class="flex justify-between items-center">
+              <label class="text-xs font-bold text-[#5A1730]">When do you need it?</label>
+              <span id="goal-time-display" class="font-serif font-bold text-lg text-[#5A1730] bg-[#EBC7B9]/50 px-3 py-1 rounded-xl border border-[#B68A55]/30">5 Years</span>
+            </div>
+            <input type="range" id="goal-timeline-slider" min="0" max="8" step="1" value="5" oninput="updateGoalTimeline()">
+            <div class="flex justify-between text-[10px] text-[#936164] font-medium px-1">
+              <span>1m</span>
+              <span>3m</span>
+              <span>6m</span>
+              <span>1y</span>
+              <span>3y</span>
+              <span>5y</span>
+              <span>7y</span>
+              <span>10y</span>
+              <span>20y</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Adaptive Strategy Banner (Short vs Long Contrast) -->
+          <div id="goal-adaptive-note" class="p-4 rounded-xl bg-[#F8E1D9] border border-[#B68A55]/40 text-xs text-[#5A1730] flex items-start space-x-3 transition-all">
+            <span class="text-2xl" id="adaptive-note-icon">💡</span>
+            <div>
+              <span class="font-bold block text-sm text-[#5A1730]" id="adaptive-note-title">Long-Term Growth Focus</span>
+              <span id="adaptive-note-body" class="text-[#794456] leading-relaxed">Multi-year horizons allow strategies to balance inflation defense and compound growth while absorbing short-term market pullbacks.</span>
+            </div>
+          </div>
+
+          <button onclick="goToStep(3)" class="w-full py-3.5 bg-[#5A1730] hover:bg-[#794456] text-white font-semibold rounded-xl transition-all text-center text-sm shadow-md">
+            Continue to Starting Point →
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 3: STARTING POINT -->
+      <section id="step-3" class="step-view hidden space-y-6 py-2">
+        <div class="text-center max-w-2xl mx-auto space-y-1">
+          <span class="text-xs uppercase tracking-widest text-[#B68A55] font-bold">Step 2 of 5</span>
+          <h2 class="text-3xl sm:text-4xl font-serif font-bold text-[#5A1730]">Your Financial Baseline</h2>
+          <p class="text-xs sm:text-sm text-[#794456]">Understanding your monthly income flow and safety net calibrates realistic momentum.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-5 max-w-4xl mx-auto">
+          <!-- Monthly Flow Input Card -->
+          <div class="momentum-card p-5 space-y-4">
+            <h3 class="text-base font-serif font-bold text-[#5A1730] flex items-center gap-2 border-b border-[#EBC7B9] pb-2">
+              <span>💸</span> Monthly Cash Flow
+            </h3>
+
+            <!-- Monthly Income -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span class="text-[#794456] font-medium">Net Monthly Income</span>
+                <span class="font-bold text-[#5A1730]" id="disp-income">£3,200</span>
+              </div>
+              <input type="range" id="slider-income" min="500" max="15000" step="100" value="3200" oninput="recalcBaseline()">
+            </div>
+
+            <!-- Essential Spending -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span class="text-[#794456] font-medium">Essential Monthly Spending</span>
+                <span class="font-bold text-[#5A1730]" id="disp-essential">£2,100</span>
+              </div>
+              <input type="range" id="slider-essential" min="300" max="12000" step="100" value="2100" oninput="recalcBaseline()">
+            </div>
+
+            <!-- Available Monthly Pool -->
+            <div class="p-3.5 rounded-xl bg-[#EBC7B9]/40 border border-[#B68A55]/40 flex justify-between items-center">
+              <div>
+                <div class="text-[10px] text-[#936164] font-bold uppercase tracking-wider">Available Monthly Pool</div>
+                <div class="text-xs text-[#794456]">Money available each month</div>
+              </div>
+              <div id="disp-surplus" class="text-2xl font-serif font-bold text-[#5A1730]">
+                £1,100
+              </div>
+            </div>
+          </div>
+
+          <!-- Cushions & Debt Card -->
+          <div class="momentum-card p-5 space-y-4">
+            <h3 class="text-base font-serif font-bold text-[#5A1730] flex items-center gap-2 border-b border-[#EBC7B9] pb-2">
+              <span>🏦</span> Current Safety & Debt
+            </h3>
+
+            <!-- Lump Sum -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span class="text-[#794456] font-medium">Starting Savings / Lump Sum</span>
+                <span class="font-bold text-[#5A1730]" id="disp-lump">£4,000</span>
+              </div>
+              <input type="range" id="slider-lump" min="0" max="100000" step="500" value="4000" oninput="recalcBaseline()">
+            </div>
+
+            <!-- Emergency Savings Level -->
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-[#794456] block">Emergency Savings Level</label>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <button type="button" onclick="setEmergencyLevel('none')" class="emerg-btn p-2 rounded-lg border text-center transition-all border-[#EBC7B9]" id="ebtn-none">None</button>
+                <button type="button" onclick="setEmergencyLevel('under1')" class="emerg-btn p-2 rounded-lg border text-center transition-all border-[#EBC7B9]" id="ebtn-under1">&lt; 1 Month</button>
+                <button type="button" onclick="setEmergencyLevel('1to3')" class="emerg-btn p-2 rounded-lg border text-center transition-all border-[#B68A55] bg-[#5A1730] text-white font-bold" id="ebtn-1to3">1–3 Months</button>
+                <button type="button" onclick="setEmergencyLevel('3plus')" class="emerg-btn p-2 rounded-lg border text-center transition-all border-[#EBC7B9]" id="ebtn-3plus">3+ Months</button>
+              </div>
+            </div>
+
+            <!-- High-Interest Debt -->
+            <div class="space-y-1">
+              <label class="text-xs font-bold text-[#794456] block">Current High-Interest Debt</label>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <button type="button" onclick="setDebtLevel('none')" class="debt-btn p-2 rounded-lg border text-center transition-all border-[#B68A55] bg-[#5A1730] text-white font-bold" id="dbtn-none">None</button>
+                <button type="button" onclick="setDebtLevel('manageable')" class="debt-btn p-2 rounded-lg border text-center transition-all border-[#EBC7B9]" id="dbtn-manageable">Manageable</button>
+                <button type="button" onclick="setDebtLevel('stressful')" class="debt-btn p-2 rounded-lg border text-center transition-all border-[#EBC7B9]" id="dbtn-stressful">Stressful</button>
+                <button type="button" onclick="setDebtLevel('urgent')" class="debt-btn p-2 rounded-lg border text-center transition-all border-[#EBC7B9]" id="dbtn-urgent">Urgent</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual Starting Insight Card -->
+        <div class="momentum-card p-4 max-w-4xl mx-auto bg-gradient-to-r from-[#FFFDFB] via-[#F8E1D9]/50 to-[#FFFDFB] flex items-center space-x-3 border-l-4 border-l-[#B68A55]">
+          <div class="text-3xl">✨</div>
+          <div class="text-xs sm:text-sm">
+            <span class="font-bold text-[#5A1730]">Starting Insight:</span>
+            <span id="insight-body" class="text-[#794456]"> You have <strong>£1,100</strong> available each month to put towards your future, alongside a <strong>£4,000</strong> starting lump sum.</span>
+          </div>
+        </div>
+
+        <div class="flex justify-between max-w-4xl mx-auto pt-2">
+          <button onclick="goToStep(2)" class="px-5 py-2 text-xs font-bold text-[#794456] hover:text-[#5A1730]">← Back</button>
+          <button onclick="goToStep(4)" class="px-8 py-3 bg-[#5A1730] hover:bg-[#794456] text-white text-sm font-semibold rounded-xl shadow-md transition-all">
+            Build Allocation Plan →
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 4: BUILD YOUR MONEY MOMENTUM PLAN (MAIN INTERACTIVE) -->
+      <section id="step-4" class="step-view hidden space-y-5 py-2">
+        <!-- Top Controls Bar -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-[#FFFDFB] p-4 rounded-2xl border border-[#B68A55]/30">
+          <div>
+            <span class="text-[10px] uppercase tracking-wider text-[#B68A55] font-bold">Interactive Plan Builder</span>
+            <h2 class="text-2xl font-serif font-bold text-[#5A1730]">Allocate Your Monthly Money Pool</h2>
+          </div>
+
+          <!-- Unallocated Monthly Pool Box & Draggable Bubbles -->
+          <div class="flex flex-col sm:flex-row items-center gap-3 bg-[#F8E1D9] p-3 rounded-xl border border-[#EBC7B9]">
+            <div class="text-left sm:text-right w-full sm:w-auto flex justify-between sm:block">
+              <div class="text-[10px] uppercase font-bold text-[#936164]">Unallocated Pool</div>
+              <div id="pool-unallocated-text" class="text-xl font-serif font-bold text-[#5A1730]">£1,100 / mo</div>
+            </div>
+
+            <!-- Draggable Money Bubbles (Desktop & Drag-enabled) -->
+            <div class="flex items-center gap-1.5" id="draggable-bubbles-container">
+              <div draggable="true" ondragstart="handleBubbleDragStart(event, 25)" class="money-bubble px-2.5 py-1 bg-[#5A1730] text-amber-100 rounded-full text-xs font-bold shadow border border-[#B68A55] flex items-center gap-1">
+                <span>💰</span> £25
+              </div>
+              <div draggable="true" ondragstart="handleBubbleDragStart(event, 50)" class="money-bubble px-2.5 py-1 bg-[#5A1730] text-amber-100 rounded-full text-xs font-bold shadow border border-[#B68A55] flex items-center gap-1">
+                <span>💰</span> £50
+              </div>
+              <div draggable="true" ondragstart="handleBubbleDragStart(event, 100)" class="money-bubble px-2.5 py-1 bg-[#5A1730] text-amber-100 rounded-full text-xs font-bold shadow border border-[#B68A55] flex items-center gap-1">
+                <span>💰</span> £100
+              </div>
+            </div>
+
+            <!-- Neutral Example Mix Button -->
+            <div class="flex flex-col items-end">
+              <button onclick="autoDistributePool()" class="text-xs bg-[#5A1730] text-amber-100 px-3 py-1.5 rounded-lg hover:bg-[#794456] transition-all font-semibold">
+                Show an example mix
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-[11px] text-[#936164] italic px-1">
+          * Illustrative example only. Adjust every pot to match your own circumstances and decisions. Drag bubbles on desktop or tap any pot to open quick allocation sliders.
+        </div>
+
+        <!-- Quick Tap Allocation Chips Tray -->
+        <div class="bg-[#EBC7B9]/30 p-3 rounded-xl border border-[#B68A55]/20 flex flex-wrap items-center gap-2">
+          <span class="text-xs text-[#794456] font-bold mr-1">Quick Add to ISA Pot:</span>
+          <button onclick="quickAddChip(25)" class="px-3 py-1 bg-white border border-[#B68A55]/40 rounded-full text-xs font-bold text-[#5A1730] hover:bg-[#5A1730] hover:text-white transition-all shadow-sm">+£25</button>
+          <button onclick="quickAddChip(50)" class="px-3 py-1 bg-white border border-[#B68A55]/40 rounded-full text-xs font-bold text-[#5A1730] hover:bg-[#5A1730] hover:text-white transition-all shadow-sm">+£50</button>
+          <button onclick="quickAddChip(100)" class="px-3 py-1 bg-white border border-[#B68A55]/40 rounded-full text-xs font-bold text-[#5A1730] hover:bg-[#5A1730] hover:text-white transition-all shadow-sm">+£100</button>
+          <button onclick="quickAddChip(250)" class="px-3 py-1 bg-white border border-[#B68A55]/40 rounded-full text-xs font-bold text-[#5A1730] hover:bg-[#5A1730] hover:text-white transition-all shadow-sm">+£250</button>
+          <button onclick="resetAllocations()" class="ml-auto text-xs text-[#936164] underline hover:text-[#5A1730]">Reset All Pots</button>
+        </div>
+
+        <!-- Money Pots Grid with Drag-Drop & Tappable Touch Triggers -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="pots-container">
+          <!-- Dynamically populated by JS -->
+        </div>
+
+        <!-- DYNAMIC CUSTOM ASSETS CONTAINER (Expanded Cards with Performance Inputs) -->
+        <div class="momentum-card p-5 bg-[#FFFDFB] border-2 border-dashed border-[#B68A55]/40 space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-[#EBC7B9] pb-3">
+            <div class="flex items-center space-x-3">
+              <span class="text-2xl">🏷️</span>
+              <div>
+                <div class="text-sm font-bold text-[#5A1730]">Dynamic Custom Assets & Choices</div>
+                <div class="text-[11px] text-[#794456]">Configure specific assets (e.g. "A - Tech Share", "B - Stocks ISA", "C - Rental Car") with yields & assumptions.</div>
+              </div>
+            </div>
+            <button onclick="promptAddCustomAsset()" class="px-4 py-2 bg-[#5A1730] text-amber-100 text-xs font-bold rounded-lg hover:bg-[#794456] transition-all shadow-sm">
+              + Add Custom Choice Asset
+            </button>
+          </div>
+
+          <!-- Dynamic List of Custom Asset Cards -->
+          <div id="custom-assets-list" class="space-y-3">
+            <!-- Injected dynamically -->
+          </div>
+        </div>
+
+        <!-- VISUAL GOAL TIMELINE & DISTANCE TRACKER -->
+        <div class="momentum-card p-5 bg-[#FFFDFB] border-2 border-[#B68A55] space-y-3">
+          <div class="flex justify-between items-center border-b border-[#EBC7B9] pb-2">
+            <div class="flex items-center space-x-2">
+              <span class="text-xl">⏱️</span>
+              <span class="font-serif font-bold text-sm text-[#5A1730]">Visual Goal Timeline Distance Tracker</span>
+            </div>
+            <span id="timeline-status-badge" class="px-3 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">On Target</span>
+          </div>
+
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs font-bold">
+              <span>Today</span>
+              <span class="text-[#5A1730]" id="timeline-target-date-text">Estimated Goal: Oct 2028</span>
+              <span id="timeline-horizon-target-text">Target: 5 Years</span>
+            </div>
+
+            <!-- Dynamic Timeline Bar -->
+            <div class="w-full bg-[#EBC7B9]/40 h-4 rounded-full overflow-hidden relative border border-[#B68A55]/30">
+              <div id="timeline-fill-bar" class="bg-gradient-to-r from-[#B68A55] to-[#5A1730] h-full transition-all duration-500" style="width: 60%"></div>
+            </div>
+
+            <div class="flex justify-between text-[10px] text-[#936164]">
+              <span>£0</span>
+              <span id="timeline-progress-subtext" class="font-semibold text-[#5A1730]">Goal Date moves closer as contributions increase</span>
+              <span id="timeline-target-val-text">Target: £50,000</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- REAL-TIME MOMENTUM DASHBOARD -->
+        <div class="momentum-card p-5 bg-gradient-to-br from-[#5A1730] to-[#794456] text-white space-y-5 gold-glow">
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center border-b border-amber-200/20 pb-3 gap-2">
+            <div>
+              <div class="text-[10px] uppercase tracking-widest text-amber-200 font-bold">Real-Time Analytics</div>
+              <h3 class="text-xl font-serif font-bold text-amber-50">Plan Health & Momentum</h3>
+            </div>
+            <!-- Score Meter -->
+            <div class="flex items-center space-x-3 bg-white/10 px-4 py-2 rounded-2xl border border-amber-200/30">
+              <div class="text-right">
+                <div class="text-[10px] text-amber-200 uppercase font-bold">Momentum Score</div>
+                <div id="momentum-score-val" class="text-2xl font-bold font-serif text-amber-300">78 / 100</div>
+              </div>
+              <div class="w-10 h-10 rounded-full border-2 border-amber-300 flex items-center justify-center font-bold text-xs bg-[#5A1730]">
+                ⚡
+              </div>
+            </div>
+          </div>
+
+          <!-- Multi-Factor Analytics Grid -->
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 text-center">
+            <div class="bg-white/5 p-2.5 rounded-xl border border-white/10">
+              <div class="text-[9px] text-amber-200 uppercase font-bold">Target Date</div>
+              <div id="dash-goal-date" class="text-xs font-bold text-amber-100 mt-1">Oct 2028</div>
+            </div>
+            <div class="bg-white/5 p-2.5 rounded-xl border border-white/10">
+              <div class="text-[9px] text-amber-200 uppercase font-bold">Resilience</div>
+              <div id="dash-resilience" class="text-xs font-bold text-emerald-300 mt-1">🛡️ Strong</div>
+            </div>
+            <div class="bg-white/5 p-2.5 rounded-xl border border-white/10">
+              <div class="text-[9px] text-amber-200 uppercase font-bold">Volatility Risk</div>
+              <div id="dash-risk" class="text-xs font-bold text-amber-200 mt-1">⚖️ Moderate</div>
+            </div>
+            <div class="bg-white/5 p-2.5 rounded-xl border border-white/10">
+              <div class="text-[9px] text-amber-200 uppercase font-bold">Cash Access</div>
+              <div id="dash-access" class="text-xs font-bold text-amber-100 mt-1">🔓 Easy</div>
+            </div>
+            <div class="bg-white/5 p-2.5 rounded-xl border border-white/10">
+              <div class="text-[9px] text-amber-200 uppercase font-bold">Concentration</div>
+              <div id="dash-concentration" class="text-xs font-bold text-amber-200 mt-1">🎯 Balanced</div>
+            </div>
+            <div class="bg-white/5 p-2.5 rounded-xl border border-white/10">
+              <div class="text-[9px] text-amber-200 uppercase font-bold">Allocation</div>
+              <div id="dash-allocated-pct" class="text-xs font-bold text-emerald-300 mt-1">100% Allocated</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center pt-2">
+          <button onclick="goToStep(3)" class="px-5 py-2 text-xs font-bold text-[#794456]">← Edit Baseline</button>
+          <button onclick="goToStep(5)" class="px-8 py-3.5 bg-[#5A1730] hover:bg-[#794456] text-white text-sm font-semibold rounded-xl shadow-lg transition-all border border-[#B68A55]">
+            Test Scenarios →
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 5: SCENARIO TESTING (AFFECTS ENGINE CALCS) -->
+      <section id="step-5" class="step-view hidden space-y-6 py-2">
+        <div class="text-center max-w-2xl mx-auto space-y-1">
+          <span class="text-xs uppercase tracking-widest text-[#B68A55] font-bold">Step 3 of 5</span>
+          <h2 class="text-3xl sm:text-4xl font-serif font-bold text-[#5A1730]">Could Your Plan Handle This?</h2>
+          <p class="text-xs sm:text-sm text-[#794456]">Tap real-world scenarios to stress-test your current allocations across live calculations.</p>
+        </div>
+
+        <!-- Scenario Cards Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-4xl mx-auto">
+          <button onclick="runScenario('dip')" class="scen-btn momentum-card p-3 text-left hover:border-[#B68A55] border-2 border-transparent transition-all">
+            <span class="text-xl">📉</span>
+            <div class="font-bold text-xs text-[#5A1730] mt-1">Market Dip</div>
+            <div class="text-[10px] text-[#936164]">15% market pullback</div>
+          </button>
+
+          <button onclick="runScenario('repair')" class="scen-btn momentum-card p-3 text-left hover:border-[#B68A55] border-2 border-transparent transition-all">
+            <span class="text-xl">🚗</span>
+            <div class="font-bold text-xs text-[#5A1730] mt-1">£1,200 Repair</div>
+            <div class="text-[10px] text-[#936164]">Unplanned cash shock</div>
+          </button>
+
+          <button onclick="runScenario('cost_of_living')" class="scen-btn momentum-card p-3 text-left hover:border-[#B68A55] border-2 border-transparent transition-all">
+            <span class="text-xl">🛒</span>
+            <div class="font-bold text-xs text-[#5A1730] mt-1">Cost of Living</div>
+            <div class="text-[10px] text-[#936164]">+£200/mo essential spend</div>
+          </button>
+
+          <button onclick="runScenario('career_break')" class="scen-btn momentum-card p-3 text-left hover:border-[#B68A55] border-2 border-transparent transition-all">
+            <span class="text-xl">🌿</span>
+            <div class="font-bold text-xs text-[#5A1730] mt-1">Career Break</div>
+            <div class="text-[10px] text-[#936164]">3 months income pause</div>
+          </button>
+
+          <button onclick="runScenario('income_up')" class="scen-btn momentum-card p-3 text-left hover:border-[#B68A55] border-2 border-transparent transition-all">
+            <span class="text-xl">📈</span>
+            <div class="font-bold text-xs text-[#5A1730] mt-1">Income Increase</div>
+            <div class="text-[10px] text-[#936164]">+£400/mo surplus boost</div>
+          </button>
+
+          <button onclick="runScenario('asset_growth')" class="scen-btn momentum-card p-3 text-left hover:border-[#B68A55] border-2 border-transparent transition-all">
+            <span class="text-xl">🚀</span>
+            <div class="font-bold text-xs text-[#5A1730] mt-1">Strong Asset Growth</div>
+            <div class="text-[10px] text-[#936164]">Higher returns</div>
+          </button>
+
+          <button onclick="runScenario('asset_down')" class="scen-btn momentum-card p-3 text-left hover:border-[#B68A55] border-2 border-transparent transition-all">
+            <span class="text-xl">⚙️</span>
+            <div class="font-bold text-xs text-[#5A1730] mt-1">Asset Downtime</div>
+            <div class="text-[10px] text-[#936164]">Unexpected repair cost</div>
+          </button>
+
+          <button onclick="runScenario('side_hustle')" class="scen-btn momentum-card p-3 text-left hover:border-[#B68A55] border-2 border-transparent transition-all">
+            <span class="text-xl">💡</span>
+            <div class="font-bold text-xs text-[#5A1730] mt-1">Side Income</div>
+            <div class="text-[10px] text-[#936164]">+£250/mo secondary stream</div>
+          </button>
+        </div>
+
+        <!-- Outcome Range Visualizer -->
+        <div class="momentum-card p-6 max-w-4xl mx-auto space-y-5">
+          <div class="flex items-center justify-between border-b border-[#EBC7B9] pb-3">
+            <div>
+              <span class="text-[10px] font-bold text-[#B68A55] uppercase tracking-wider">Active Scenario Simulation</span>
+              <h3 id="scen-title" class="text-xl font-serif font-bold text-[#5A1730]">Baseline Projection</h3>
+            </div>
+            <span id="scen-status-pill" class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">Steady Buffer</span>
+          </div>
+
+          <p id="scen-desc" class="text-xs sm:text-sm text-[#794456]">
+            Showing expected outcome ranges based on your current allocation across different conditions.
+          </p>
+
+          <!-- 3 Visual Case Cards -->
+          <div class="grid sm:grid-cols-3 gap-4">
+            <!-- Steady Case -->
+            <div class="p-4 rounded-2xl bg-[#E8F0E8] border-2 border-[#718871] space-y-2">
+              <div class="flex justify-between items-center text-[#527A52] text-xs font-bold">
+                <span>🛡️ Steady Case</span>
+                <span class="text-[10px] bg-white/80 px-2 py-0.5 rounded-full">Low Volatility</span>
+              </div>
+              <div id="scen-val-steady" class="text-2xl font-serif font-bold text-[#527A52]">£52,400</div>
+              <p class="text-[11px] text-[#527A52] leading-tight">Capital protection focus with consistent baseline returns.</p>
+            </div>
+
+            <!-- Expected Target Case -->
+            <div class="p-4 rounded-2xl bg-[#FFFDFB] border-2 border-[#B68A55] space-y-2 shadow-sm">
+              <div class="flex justify-between items-center text-[#5A1730] text-xs font-bold">
+                <span>🎯 Expected Case</span>
+                <span class="text-[10px] bg-[#EBC7B9]/50 text-[#5A1730] px-2 py-0.5 rounded-full font-bold">Target</span>
+              </div>
+              <div id="scen-val-expected" class="text-2xl font-serif font-bold text-[#5A1730]">£64,800</div>
+              <p class="text-[11px] text-[#794456] leading-tight">Hypothetical middle outcome based on historical averages.</p>
+            </div>
+
+            <!-- Difficult Stress Case -->
+            <div class="p-4 rounded-2xl bg-[#F8E1D9] border-2 border-rose-300 space-y-2">
+              <div class="flex justify-between items-center text-rose-900 text-xs font-bold">
+                <span>🌧️ Difficult Case</span>
+                <span class="text-[10px] bg-white/80 px-2 py-0.5 rounded-full text-rose-800">Stress Test</span>
+              </div>
+              <div id="scen-val-difficult" class="text-2xl font-serif font-bold text-rose-950">£43,100</div>
+              <p class="text-[11px] text-rose-900 leading-tight">Models pullbacks, downtime, or unexpected cost shocks.</p>
+            </div>
+          </div>
+
+          <div class="text-[10px] text-[#936164] italic text-center">
+            Note: All outcomes are hypothetical educational illustrations. Nothing here guarantees future performance.
+          </div>
+        </div>
+
+        <div class="flex justify-between max-w-4xl mx-auto pt-2">
+          <button onclick="goToStep(4)" class="px-5 py-2 text-xs font-bold text-[#794456]">← Modify Allocation</button>
+          <button onclick="goToStep(6)" class="px-8 py-3.5 bg-[#5A1730] hover:bg-[#794456] text-white text-sm font-semibold rounded-xl shadow-md transition-all">
+            Quarterly Review Simulation →
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 6: THREE-MONTH REVIEW (FULLY DYNAMIC REAL ENGINE CALCS) -->
+      <section id="step-6" class="step-view hidden space-y-6 py-2">
+        <div class="text-center max-w-2xl mx-auto space-y-1">
+          <span class="text-xs uppercase tracking-widest text-[#B68A55] font-bold">Step 4 of 5</span>
+          <h2 class="text-3xl sm:text-4xl font-serif font-bold text-[#5A1730]">3-Month Portfolio Review</h2>
+          <p class="text-xs sm:text-sm text-[#794456]">In real life, assets deviate from plans. Practice adapting calmly without emotion.</p>
+        </div>
+
+        <!-- Sample Portfolio Deviation Screen -->
+        <div class="momentum-card p-5 max-w-4xl mx-auto space-y-4">
+          <div class="flex items-center justify-between border-b border-[#EBC7B9] pb-3">
+            <h3 class="text-base font-serif font-bold text-[#5A1730]">Sample Asset Deviations (Quarter 1)</h3>
+            <span class="text-xs bg-[#EBC7B9]/50 text-[#5A1730] px-3 py-1 rounded-full font-bold">Live Asset Simulation</span>
+          </div>
+
+          <div class="grid sm:grid-cols-3 gap-3" id="review-deviations-grid">
+            <!-- Populated dynamically based on user custom assets -->
+          </div>
+
+          <!-- Calm Neutral Insight -->
+          <div class="p-4 rounded-xl bg-[#F8E1D9] border border-[#EBC7B9] flex items-start space-x-3 text-xs text-[#5A1730]">
+            <span class="text-xl">⚖️</span>
+            <div>
+              <span class="font-bold block text-sm mb-0.5">Calm Neutral Insight:</span>
+              <span id="review-neutral-insight-text">Your plan is now more dependent on Asset A due to high growth. Asset C produced less cash than expected, and your available safety buffer may be under mild pressure.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Explore Your Options (Fully Interactive Live Engine Update Buttons) -->
+        <div class="momentum-card p-6 max-w-4xl mx-auto space-y-5">
+          <div class="flex justify-between items-center">
+            <h3 class="text-xl font-serif font-bold text-[#5A1730]">Explore Your Options</h3>
+            <button id="undo-test-btn" onclick="revertReviewTest()" class="hidden px-3 py-1 bg-[#936164] text-white text-xs font-bold rounded-lg hover:bg-[#5A1730] transition-all">
+              ↩ Undo Test / Reset
+            </button>
+          </div>
+          <p class="text-xs text-[#794456]">Tap any choice below to explore trade-offs and see real calculated results update instantly:</p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <button onclick="testReviewOption('keep')" class="rev-btn p-3 text-xs font-bold text-left rounded-xl border border-[#B68A55]/40 hover:bg-[#5A1730] hover:text-white transition-all bg-white text-[#5A1730]">Keep Plan As Is</button>
+            <button onclick="testReviewOption('into_A')" class="rev-btn p-3 text-xs font-bold text-left rounded-xl border border-[#B68A55]/40 hover:bg-[#5A1730] hover:text-white transition-all bg-white text-[#5A1730]">Contributions Into A</button>
+            <button onclick="testReviewOption('reduce_C')" class="rev-btn p-3 text-xs font-bold text-left rounded-xl border border-[#B68A55]/40 hover:bg-[#5A1730] hover:text-white transition-all bg-white text-[#5A1730]">Reduce C Allocations</button>
+            <button onclick="testReviewOption('move_safety')" class="rev-btn p-3 text-xs font-bold text-left rounded-xl border border-[#B68A55]/40 hover:bg-[#5A1730] hover:text-white transition-all bg-white text-[#5A1730]">Move Back to Safety</button>
+            <button onclick="testReviewOption('rebalance_A')" class="rev-btn p-3 text-xs font-bold text-left rounded-xl border border-[#B68A55]/40 hover:bg-[#5A1730] hover:text-white transition-all bg-white text-[#5A1730]">Shift Funds into A</button>
+            <button onclick="testReviewOption('diversify')" class="rev-btn p-3 text-xs font-bold text-left rounded-xl border border-[#B68A55]/40 hover:bg-[#5A1730] hover:text-white transition-all bg-white text-[#5A1730]">Test Diversified Mix</button>
+            <button onclick="testReviewOption('pause_risk')" class="rev-btn p-3 text-xs font-bold text-left rounded-xl border border-[#B68A55]/40 hover:bg-[#5A1730] hover:text-white transition-all bg-white text-[#5A1730]">Pause High-Risk</button>
+            <button onclick="testReviewOption('extend_time')" class="rev-btn p-3 text-xs font-bold text-left rounded-xl border border-[#B68A55]/40 hover:bg-[#5A1730] hover:text-white transition-all bg-white text-[#5A1730]">Extend Goal Date</button>
+          </div>
+
+          <!-- Trade-off Live Response Panel -->
+          <div id="tradeoff-panel" class="p-5 rounded-2xl bg-[#FFFDFB] border-2 border-[#B68A55] space-y-4 shadow-sm">
+            <div class="flex items-center justify-between border-b border-[#EBC7B9] pb-2">
+              <span id="tradeoff-title" class="font-serif font-bold text-base text-[#5A1730]">Explore what could happen if...</span>
+              <span id="tradeoff-tag" class="text-xs px-3 py-1 rounded-full font-bold bg-[#EBC7B9] text-[#5A1730]">Scenario Model</span>
+            </div>
+
+            <p id="tradeoff-text" class="text-xs sm:text-sm text-[#794456] leading-relaxed">
+              Select any option above to model potential impact on goal timing, cash liquidity, and concentration risk.
+            </p>
+
+            <!-- Action Banner -->
+            <div id="test-shift-summary" class="hidden p-3 rounded-xl bg-[#F8E1D9] border border-[#B68A55]/40 text-xs text-[#5A1730] font-semibold flex justify-between items-center">
+              <span id="test-shift-text">Illustrative Shift: £100/mo moved from C to Safety Savings</span>
+              <button onclick="applyReviewTestAsNewPlan()" class="px-3 py-1 bg-[#5A1730] text-amber-100 rounded-lg text-xs font-bold hover:bg-[#794456]">Apply as my new plan</button>
+            </div>
+
+            <!-- Dynamic Live Impact Metrics Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center pt-2">
+              <div class="p-2.5 bg-[#F8E1D9]/50 rounded-xl border border-[#B68A55]/20">
+                <div class="text-[10px] uppercase font-bold text-[#936164]">Estimated Date</div>
+                <div id="tr-goal-date" class="text-xs font-bold text-[#5A1730] mt-1">Oct 2028</div>
+              </div>
+              <div class="p-2.5 bg-[#F8E1D9]/50 rounded-xl border border-[#B68A55]/20">
+                <div class="text-[10px] uppercase font-bold text-[#936164]">Difficult Case</div>
+                <div id="tr-difficult" class="text-xs font-bold text-[#5A1730] mt-1">£43,100</div>
+              </div>
+              <div class="p-2.5 bg-[#F8E1D9]/50 rounded-xl border border-[#B68A55]/20">
+                <div class="text-[10px] uppercase font-bold text-[#936164]">Concentration</div>
+                <div id="tr-conc" class="text-xs font-bold text-[#5A1730] mt-1">🎯 Balanced</div>
+              </div>
+              <div class="p-2.5 bg-[#F8E1D9]/50 rounded-xl border border-[#B68A55]/20">
+                <div class="text-[10px] uppercase font-bold text-[#936164]">Cash Access</div>
+                <div id="tr-access" class="text-xs font-bold text-[#5A1730] mt-1">🔓 Easy</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between max-w-4xl mx-auto pt-2">
+          <button onclick="goToStep(5)" class="px-5 py-2 text-xs font-bold text-[#794456]">← Back to Scenarios</button>
+          <button onclick="goToStep(7)" class="px-8 py-3.5 bg-[#5A1730] hover:bg-[#794456] text-white text-sm font-semibold rounded-xl shadow-md transition-all">
+            View Final Momentum Map →
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 7: RESULTS / MY MONEY MOMENTUM MAP -->
+      <section id="step-7" class="step-view hidden space-y-6 py-2">
+        <div class="text-center max-w-2xl mx-auto space-y-1">
+          <div class="w-12 h-12 mx-auto rounded-full bg-[#5A1730] text-amber-200 flex items-center justify-center text-xl font-serif font-bold shadow-md border-2 border-[#B68A55]">
+            ✦
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-serif font-bold text-[#5A1730]">My Money Momentum Map</h2>
+          <p class="text-xs sm:text-sm text-[#794456]">Your educational roadmap and visual trade-off summary.</p>
+        </div>
+
+        <!-- Master Summary Card -->
+        <div class="momentum-card p-6 sm:p-8 max-w-4xl mx-auto space-y-6 bg-gradient-to-b from-[#FFFDFB] via-[#FFFDFB] to-[#F8E1D9]/50 border-2 border-[#B68A55]">
+          <!-- Header Overview -->
+          <div class="grid sm:grid-cols-3 gap-4 border-b border-[#EBC7B9] pb-5">
+            <div>
+              <div class="text-[10px] uppercase text-[#936164] font-bold tracking-wider">Selected Goal</div>
+              <div id="res-goal-name" class="text-xl font-serif font-bold text-[#5A1730]">Build Long-Term Wealth</div>
+              <div id="res-goal-target" class="text-xs text-[#794456]">Target: £50,000</div>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase text-[#936164] font-bold tracking-wider">Time Horizon</div>
+              <div id="res-horizon" class="text-xl font-serif font-bold text-[#5A1730]">5 Years</div>
+              <div id="res-target-date" class="text-xs text-[#794456]">Est. Goal: Oct 2028</div>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase text-[#936164] font-bold tracking-wider">Momentum Score</div>
+              <div id="res-score" class="text-3xl font-serif font-bold text-[#B68A55]">78 / 100</div>
+            </div>
+          </div>
+
+          <!-- Allocation Breakdown -->
+          <div>
+            <h3 class="text-xs font-bold text-[#5A1730] uppercase tracking-wider mb-3">Current Monthly Allocations</h3>
+            <div id="res-allocation-list" class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <!-- JS Injected -->
+            </div>
+          </div>
+
+          <!-- Outcome Range Summary Card -->
+          <div class="p-5 rounded-2xl bg-[#5A1730] text-white space-y-3">
+            <div class="text-[10px] uppercase text-amber-200 tracking-wider font-bold">Hypothetical Outcome Range</div>
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <div>
+                <div class="text-[10px] text-amber-200/80">Steady Case</div>
+                <div id="res-val-steady" class="text-lg font-bold text-amber-100">£52,400</div>
+              </div>
+              <div>
+                <div class="text-[10px] text-amber-300">Expected Target</div>
+                <div id="res-val-exp" class="text-xl font-bold text-amber-300">£64,800</div>
+              </div>
+              <div>
+                <div class="text-[10px] text-amber-200/80">Difficult Case</div>
+                <div id="res-val-diff" class="text-lg font-bold text-rose-200">£43,100</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Strengths & Risks -->
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div class="p-4 rounded-xl bg-[#E8F0E8] border border-[#718871]/40">
+              <div class="text-xs font-bold text-[#527A52] uppercase flex items-center gap-1.5">
+                <span>💪</span> Strongest Part of Plan
+              </div>
+              <p id="res-strongest" class="text-xs text-[#527A52] mt-1 leading-relaxed">
+                You have created a healthy monthly allocation with a solid baseline cushion.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-xl bg-amber-50 border border-amber-200">
+              <div class="text-xs font-bold text-amber-900 uppercase flex items-center gap-1.5">
+                <span>⚠️</span> Key Risk to Watch
+              </div>
+              <p id="res-risk" class="text-xs text-amber-900 mt-1 leading-relaxed">
+                Watch concentration risks in higher-volatility assets if timeline shortens.
+              </p>
+            </div>
+          </div>
+
+          <!-- Educational Next Steps -->
+          <div class="space-y-3">
+            <h3 class="text-xs font-bold text-[#5A1730] uppercase tracking-wider">Three Educational Next Steps</h3>
+            <div class="space-y-2 text-xs">
+              <div class="p-3 bg-[#FFFDFB] rounded-xl border border-[#EBC7B9] flex items-start space-x-3">
+                <span class="font-bold text-[#5A1730]">1.</span>
+                <span class="text-[#794456]">Review your emergency savings level to ensure 3–6 months of essential expenses remain easily accessible.</span>
+              </div>
+              <div class="p-3 bg-[#FFFDFB] rounded-xl border border-[#EBC7B9] flex items-start space-x-3">
+                <span class="font-bold text-[#5A1730]">2.</span>
+                <span class="text-[#794456]">Learn about tax-efficient wrappers like ISAs and pensions before choosing specific asset classes.</span>
+              </div>
+              <div class="p-3 bg-[#FFFDFB] rounded-xl border border-[#EBC7B9] flex items-start space-x-3">
+                <span class="font-bold text-[#5A1730]">3.</span>
+                <span class="text-[#794456]">Schedule recurring quarterly reviews to re-check trade-offs calmly without emotional reactions.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex flex-col sm:flex-row gap-3 pt-3 border-t border-[#EBC7B9]">
+            <button onclick="goToStep(1)" class="w-full sm:w-1/2 py-3 bg-[#EBC7B9] hover:bg-[#B68A55] text-[#5A1730] hover:text-white font-bold rounded-xl transition-all text-xs">
+              ↻ Start Again / Reset
+            </button>
+            <button onclick="openSaveModal()" class="w-full sm:w-1/2 py-3 bg-[#5A1730] hover:bg-[#794456] text-white font-bold rounded-xl shadow-md transition-all text-xs border border-[#B68A55]">
+              ✉️ Save My Plan Summary
+            </button>
+          </div>
+        </div>
+
+        <!-- Compliance Disclaimer -->
+        <div class="text-center max-w-2xl mx-auto pt-2">
+          <p class="text-[11px] text-[#936164] leading-relaxed italic">
+            <strong>Disclaimer:</strong> This simulator provides educational illustrations only and does not provide financial, investment, tax, or legal advice. All investments and income assets carry risk. You are responsible for your own decisions.
+          </p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer Branding -->
+    <footer class="mt-8 py-4 text-center border-t border-[#EBC7B9]/60 text-xs text-[#936164]">
+      <p>MONEY MOMENTUM <span class="brand-script text-base text-[#B68A55] font-normal">by Mariam</span> • Educational Planning Simulator</p>
+    </footer>
+
+  </div>
+
+  <!-- MOBILE POT TOUCH MODAL / BOTTOM SHEET -->
+  <div id="pot-touch-sheet" class="fixed inset-0 bg-[#5A1730]/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+    <div class="momentum-card max-w-md w-full p-6 space-y-4 bg-[#FFFDFB] rounded-t-3xl sm:rounded-2xl relative bottom-sheet">
+      <button onclick="closePotSheet()" class="absolute top-4 right-4 text-[#794456] hover:text-[#5A1730] font-bold text-lg">✕</button>
+      <div class="flex items-center space-x-3 border-b border-[#EBC7B9] pb-3">
+        <span id="sheet-pot-icon" class="text-3xl">🛡️</span>
+        <div>
+          <h3 id="sheet-pot-name" class="text-lg font-serif font-bold text-[#5A1730]">Safety Savings</h3>
+          <p id="sheet-pot-desc" class="text-xs text-[#794456]">Emergency cash buffer</p>
+        </div>
+      </div>
+
+      <div class="space-y-4 py-2">
+        <div class="flex justify-between items-center">
+          <span class="text-xs font-bold text-[#5A1730]">Monthly Allocation:</span>
+          <span id="sheet-pot-val" class="font-serif font-bold text-2xl text-[#5A1730]">£0/mo</span>
+        </div>
+
+        <!-- Amount Slider inside Mobile Sheet -->
+        <input type="range" id="sheet-pot-slider" min="0" max="2000" step="25" value="0" oninput="syncSheetPotSlider()">
+
+        <!-- Quick Stepper Buttons -->
+        <div class="grid grid-cols-4 gap-2">
+          <button onclick="adjustSheetPotAmount(-100)" class="py-2 rounded-xl bg-[#EBC7B9]/50 text-[#5A1730] font-bold text-xs hover:bg-[#5A1730] hover:text-white transition-all">-£100</button>
+          <button onclick="adjustSheetPotAmount(-25)" class="py-2 rounded-xl bg-[#EBC7B9]/50 text-[#5A1730] font-bold text-xs hover:bg-[#5A1730] hover:text-white transition-all">-£25</button>
+          <button onclick="adjustSheetPotAmount(25)" class="py-2 rounded-xl bg-[#5A1730] text-amber-100 font-bold text-xs hover:bg-[#794456] transition-all">+£25</button>
+          <button onclick="adjustSheetPotAmount(100)" class="py-2 rounded-xl bg-[#5A1730] text-amber-100 font-bold text-xs hover:bg-[#794456] transition-all">+£100</button>
+        </div>
+      </div>
+
+      <button onclick="closePotSheet()" class="w-full py-3 bg-[#5A1730] text-amber-100 text-xs font-bold rounded-xl hover:bg-[#794456] transition-all">
+        Confirm Allocation
+      </button>
+    </div>
+  </div>
+
+  <!-- SAVE MOCK MODAL -->
+  <div id="save-modal" class="fixed inset-0 bg-[#5A1730]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="momentum-card max-w-md w-full p-6 space-y-4 bg-[#FFFDFB] relative">
+      <button onclick="closeSaveModal()" class="absolute top-4 right-4 text-[#794456] hover:text-[#5A1730] font-bold text-lg">✕</button>
+      <div class="text-center space-y-2">
+        <span class="text-3xl">✉️</span>
+        <h3 class="text-2xl font-serif font-bold text-[#5A1730]">Save Your Momentum Map</h3>
+        <p class="text-xs text-[#794456]">Enter your email to receive a copy of your personal Money Momentum map.</p>
+      </div>
+      <div class="space-y-3">
+        <input type="email" id="modal-email" placeholder="yourname@example.com" class="w-full p-3 rounded-xl border border-[#B68A55]/40 text-sm focus:outline-none focus:ring-2 focus:ring-[#5A1730]">
+        <button onclick="submitSavePlan()" class="w-full py-3 bg-[#5A1730] hover:bg-[#794456] text-white font-semibold rounded-xl text-xs shadow-md transition-all">
+          Send My Plan Summary
+        </button>
+      </div>
+      <div id="modal-feedback" class="hidden text-center text-xs font-bold text-emerald-800 bg-emerald-100 p-2 rounded-lg">
+        ✓ Your plan map has been saved!
+      </div>
+    </div>
+  </div>
+
+  <!-- UNIFIED JAVASCRIPT LOGIC ENGINE -->
+  <script>
+    // GLOBAL STATE
+    const state = {
+      currentStep: 1,
+      goal: {
+        title: "Build Long-Term Wealth",
+        amount: 50000,
+        timelineMonths: 60,
+        icon: "💎",
+        horizonType: "long"
+      },
+      baseline: {
+        income: 3200,
+        essential: 2100,
+        surplus: 1100,
+        lumpSum: 4000,
+        emergencyLevel: "1to3",
+        debtLevel: "none"
+      },
+      allocations: {
+        safety: 300,
+        debt: 0,
+        isa: 300,
+        pension: 150,
+        investment: 150,
+        incomeAsset: 100,
+        business: 0,
+        highRisk: 100,
+        goalPot: 0
+      },
+      customAssets: [
+        {
+          id: "asset_a",
+          name: "A - Tech Share",
+          potKey: "highRisk",
+          startingAmt: 1000,
+          monthlyContrib: 100,
+          actualGrowthPct: 8,
+          actualMonthlyIncome: 0,
+          monthlyCosts: 0,
+          downtimeMonths: 0,
+          lowAssumptionPct: -10,
+          expAssumptionPct: 12,
+          highAssumptionPct: 25
+        },
+        {
+          id: "asset_b",
+          name: "B - Stocks & Shares ISA",
+          potKey: "isa",
+          startingAmt: 2500,
+          monthlyContrib: 200,
+          actualGrowthPct: -1,
+          actualMonthlyIncome: 0,
+          monthlyCosts: 0,
+          downtimeMonths: 0,
+          lowAssumptionPct: -5,
+          expAssumptionPct: 6,
+          highAssumptionPct: 14
+        },
+        {
+          id: "asset_c",
+          name: "C - Rental Car",
+          potKey: "incomeAsset",
+          startingAmt: 5000,
+          monthlyContrib: 50,
+          actualGrowthPct: 0,
+          actualMonthlyIncome: 80,
+          monthlyCosts: 40,
+          downtimeMonths: 1,
+          lowAssumptionPct: 0,
+          expAssumptionPct: 8,
+          highAssumptionPct: 15
+        }
+      ],
+      activeScenario: "baseline",
+      activeReviewOption: "keep",
+      backupAllocations: null,
+      activeTouchPotKey: null,
+      draggedBubbleValue: 0
+    };
+
+    // POT METADATA
+    const POT_META = {
+      safety: { name: "Safety Savings", icon: "🛡️", growth: "Low", riskLabel: "Low Risk", riskIcon: "🟢", access: "Easy", desc: "Emergency cash buffer." },
+      debt: { name: "Debt Payoff", icon: "🕊️", growth: "Guaranteed", riskLabel: "Low Risk", riskIcon: "🟢", access: "Restricted", desc: "Clearing interest pressure." },
+      isa: { name: "ISA / Growth", icon: "🌱", growth: "Medium", riskLabel: "Moderate Risk", riskIcon: "🟡", access: "Easy", desc: "Tax-efficient flexible growth." },
+      pension: { name: "Pension Pot", icon: "🌅", growth: "Medium-High", riskLabel: "Moderate Risk", riskIcon: "🟡", access: "Restricted", desc: "Long-term retirement buffer." },
+      investment: { name: "Investment Pot", icon: "📈", growth: "Medium", riskLabel: "Moderate Risk", riskIcon: "🟡", access: "Moderate", desc: "Diversified index strategies." },
+      incomeAsset: { name: "Income Asset", icon: "🚘", growth: "Medium", riskLabel: "Moderate-High", riskIcon: "🟠", access: "Moderate", desc: "Yield-generating tools or rentals." },
+      business: { name: "Business Growth", icon: "🚀", growth: "High Potential", riskLabel: "Higher Risk", riskIcon: "🔴", access: "Moderate", desc: "Direct venture investments." },
+      highRisk: { name: "Higher-Risk Growth", icon: "⚡", growth: "High Potential", riskLabel: "Higher Volatility", riskIcon: "🔴", access: "Moderate", desc: "Higher market price swings." },
+      goalPot: { name: "Goal Pot", icon: "🎯", growth: "Low-Medium", riskLabel: "Low Risk", riskIcon: "🟢", access: "Easy", desc: "Direct dedicated savings." }
+    };
+
+    const TIMELINE_STEPS = [1, 3, 6, 12, 36, 60, 84, 120, 240]; // Months
+
+    // INIT ON LOAD
+    window.onload = function() {
+      renderPotsGrid();
+      renderCustomAssetCards();
+      recalcBaseline();
+      updateGoalTimeline();
+      updateHeaderProgress();
+    };
+
+    // NAVIGATION
+    function goToStep(stepNum) {
+      state.currentStep = stepNum;
+      document.querySelectorAll('.step-view').forEach(el => el.classList.add('hidden'));
+      const activeEl = document.getElementById(`step-${stepNum}`);
+      if(activeEl) activeEl.classList.remove('hidden');
+
+      const progressWrap = document.getElementById('top-progress-bar-wrap');
+      if (stepNum > 1) {
+        progressWrap.classList.remove('hidden');
+      } else {
+        progressWrap.classList.add('hidden');
+      }
+
+      updateHeaderProgress();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (stepNum === 4) {
+        updatePlanCalculations();
+      } else if (stepNum === 5) {
+        runScenario(state.activeScenario || 'dip');
+      } else if (stepNum === 6) {
+        renderQuarterlyReviewDeviations();
+        testReviewOption(state.activeReviewOption || 'keep');
+      } else if (stepNum === 7) {
+        buildFinalMap();
+      }
+    }
+
+    function updateHeaderProgress() {
+      const pct = Math.round((state.currentStep / 7) * 100);
+      document.getElementById('current-step-num').innerText = state.currentStep;
+      document.getElementById('header-progress-bar').style.width = `${pct}%`;
+      document.getElementById('main-progress-bar').style.width = `${pct}%`;
+    }
+
+    // STEP 2: GOAL SELECTION
+    function selectGoal(title, defaultAmt, defaultMonths, icon, horizonType) {
+      state.goal.title = title;
+      state.goal.amount = defaultAmt;
+      state.goal.timelineMonths = defaultMonths;
+      state.goal.icon = icon;
+      state.goal.horizonType = horizonType;
+
+      document.getElementById('goal-title-input').value = title;
+      document.getElementById('goal-amount-input').value = defaultAmt;
+      document.getElementById('goal-amount-slider').value = defaultAmt;
+      document.getElementById('custom-goal-icon').innerText = icon;
+
+      let idx = TIMELINE_STEPS.indexOf(defaultMonths);
+      if (idx === -1) idx = 5;
+      document.getElementById('goal-timeline-slider').value = idx;
+
+      updateGoalTimeline();
+    }
+
+    function syncGoalAmountSlider() {
+      const val = parseFloat(document.getElementById('goal-amount-input').value) || 0;
+      state.goal.amount = val;
+      document.getElementById('goal-amount-slider').value = val;
+      updateGoalAdaptiveLanguage();
+      if(state.currentStep === 4) updatePlanCalculations();
+    }
+
+    function syncGoalAmountInput() {
+      const val = parseFloat(document.getElementById('goal-amount-slider').value) || 0;
+      state.goal.amount = val;
+      document.getElementById('goal-amount-input').value = val;
+      updateGoalAdaptiveLanguage();
+      if(state.currentStep === 4) updatePlanCalculations();
+    }
+
+    function updateGoalFromInputs() {
+      state.goal.title = document.getElementById('goal-title-input').value || "My Goal";
+    }
+
+    function updateGoalTimeline() {
+      const idx = parseInt(document.getElementById('goal-timeline-slider').value);
+      const months = TIMELINE_STEPS[idx];
+      state.goal.timelineMonths = months;
+
+      let disp = "";
+      if (months < 12) {
+        disp = `${months} Month${months > 1 ? 's' : ''}`;
+      } else {
+        const yrs = months / 12;
+        disp = `${yrs} Year${yrs > 1 ? 's' : ''}`;
+      }
+      document.getElementById('goal-time-display').innerText = disp;
+
+      updateGoalAdaptiveLanguage();
+      if(state.currentStep === 4) updatePlanCalculations();
+    }
+
+    function updateGoalAdaptiveLanguage() {
+      const m = state.goal.timelineMonths;
+      const noteTitle = document.getElementById('adaptive-note-title');
+      const noteBody = document.getElementById('adaptive-note-body');
+      const badgeText = document.getElementById('horizon-badge-text');
+      const badgeIcon = document.getElementById('horizon-badge-icon');
+      const badge = document.getElementById('time-horizon-badge');
+
+      if (m <= 6) {
+        state.goal.horizonType = "short";
+        badgeText.innerText = "Short-Term Protection";
+        badgeIcon.innerText = "🛡️";
+        badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-emerald-800 text-emerald-100 flex items-center gap-1.5";
+        noteTitle.innerText = "Short-Term Focus: Capital Protection";
+        noteBody.innerText = "For goals under 12 months, focus on capital protection and liquidity. Avoid volatile allocations that could dip right when you need cash.";
+      } else if (m <= 36) {
+        state.goal.horizonType = "medium";
+        badgeText.innerText = "Medium-Term Balance";
+        badgeIcon.innerText = "⚖️";
+        badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-amber-800 text-amber-100 flex items-center gap-1.5";
+        noteTitle.innerText = "Medium-Term Horizon: Growth & Safety Balance";
+        noteBody.innerText = "With 1 to 3 years, balance yield strategies with strong safety buffers to keep on schedule without excessive market exposure.";
+      } else {
+        state.goal.horizonType = "long";
+        badgeText.innerText = "Long-Term Growth";
+        badgeIcon.innerText = "💎";
+        badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-[#5A1730] text-amber-100 flex items-center gap-1.5";
+        noteTitle.innerText = "Long-Term Horizon: Compound Growth & Diversification";
+        noteBody.innerText = "Multi-year horizons allow strategies to balance inflation defense and compound growth while absorbing short-term market pullbacks.";
+      }
+    }
+
+    // STEP 3: BASELINE CALCULATIONS
+    function recalcBaseline() {
+      const income = parseInt(document.getElementById('slider-income').value);
+      const essential = parseInt(document.getElementById('slider-essential').value);
+      const lump = parseInt(document.getElementById('slider-lump').value);
+
+      state.baseline.income = income;
+      state.baseline.essential = essential;
+      state.baseline.surplus = Math.max(0, income - essential);
+      state.baseline.lumpSum = lump;
+
+      document.getElementById('disp-income').innerText = `£${income.toLocaleString()}`;
+      document.getElementById('disp-essential').innerText = `£${essential.toLocaleString()}`;
+      document.getElementById('disp-surplus').innerText = `£${state.baseline.surplus.toLocaleString()}`;
+      document.getElementById('disp-lump').innerText = `£${lump.toLocaleString()}`;
+
+      document.getElementById('insight-body').innerHTML = ` You have <strong>£${state.baseline.surplus.toLocaleString()}</strong> available each month to allocate, alongside a starting lump sum of <strong>£${lump.toLocaleString()}</strong>.`;
+
+      if(state.currentStep === 4) updatePlanCalculations();
+    }
+
+    function setEmergencyLevel(lvl) {
+      state.baseline.emergencyLevel = lvl;
+      document.querySelectorAll('.emerg-btn').forEach(btn => {
+        btn.className = "emerg-btn p-2 rounded-lg border text-center transition-all border-[#EBC7B9]";
+      });
+      document.getElementById(`ebtn-${lvl}`).className = "emerg-btn p-2 rounded-lg border text-center transition-all border-[#B68A55] bg-[#5A1730] text-white font-bold";
+    }
+
+    function setDebtLevel(lvl) {
+      state.baseline.debtLevel = lvl;
+      document.querySelectorAll('.debt-btn').forEach(btn => {
+        btn.className = "debt-btn p-2 rounded-lg border text-center transition-all border-[#EBC7B9]";
+      });
+      document.getElementById(`dbtn-${lvl}`).className = "debt-btn p-2 rounded-lg border text-center transition-all border-[#B68A55] bg-[#5A1730] text-white font-bold";
+    }
+
+    // STEP 4: MONEY POOL & DRAG-DROP / TOUCH LOGIC
+    function renderPotsGrid() {
+      const container = document.getElementById('pots-container');
+      container.innerHTML = "";
+
+      Object.keys(POT_META).forEach(key => {
+        const pot = POT_META[key];
+        const val = state.allocations[key] || 0;
+
+        const potCard = document.createElement('div');
+        potCard.className = "momentum-card pot-drop-zone p-4 flex flex-col justify-between space-y-3 relative overflow-hidden bg-[#FFFDFB] cursor-pointer hover:border-[#5A1730]";
+        potCard.id = `pot-card-${key}`;
+
+        // Drag events for Desktop
+        potCard.ondragover = (e) => { e.preventDefault(); potCard.classList.add('drag-over'); };
+        potCard.ondragleave = () => potCard.classList.remove('drag-over');
+        potCard.ondrop = (e) => handleBubbleDrop(e, key);
+
+        // Tap for Mobile Bottom Sheet
+        potCard.onclick = (e) => {
+          if(e.target.tagName !== 'BUTTON') {
+            openPotSheet(key);
+          }
+        };
+
+        potCard.innerHTML = `
+          <div class="flex items-start justify-between relative z-10">
+            <div class="flex items-center space-x-2">
+              <span class="text-2xl">${pot.icon}</span>
+              <div>
+                <div class="font-serif font-bold text-sm text-[#5A1730]">${pot.name}</div>
+                <div class="text-[10px] text-[#936164]">${pot.desc}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Liquid Animated Fill Height -->
+          <div class="w-full bg-[#EBC7B9]/30 h-3 rounded-full overflow-hidden relative border border-[#B68A55]/20">
+            <div id="pot-bar-${key}" class="pot-liquid h-full" style="width: 0%"></div>
+          </div>
+
+          <!-- Custom Asset Badges -->
+          <div id="pot-labels-${key}" class="flex flex-wrap gap-1 text-[10px] relative z-10">
+          </div>
+
+          <!-- Controls -->
+          <div class="flex items-center justify-between pt-1 border-t border-[#EBC7B9]/40 relative z-10">
+            <div class="text-xs font-bold text-[#5A1730]" id="pot-val-text-${key}">£${val}/mo</div>
+            <div class="flex items-center space-x-1">
+              <button onclick="event.stopPropagation(); adjustPot('${key}', -25)" class="w-8 h-8 rounded-lg bg-[#EBC7B9]/50 hover:bg-[#5A1730] hover:text-white font-bold text-xs transition-all flex items-center justify-center">-</button>
+              <button onclick="event.stopPropagation(); adjustPot('${key}', 25)" class="w-8 h-8 rounded-lg bg-[#5A1730] text-amber-100 hover:bg-[#794456] font-bold text-xs transition-all flex items-center justify-center">+</button>
+            </div>
+          </div>
+
+          <!-- Accessible Risk & Yield Badges -->
+          <div class="flex justify-between text-[9px] text-[#936164] font-medium pt-0.5 relative z-10">
+            <span>Growth: <strong class="text-[#5A1730]">${pot.growth}</strong></span>
+            <span class="flex items-center gap-1">${pot.riskIcon} <strong class="text-[#5A1730]">${pot.riskLabel}</strong></span>
+          </div>
+        `;
+
+        container.appendChild(potCard);
+      });
+      renderCustomAssetLabels();
+    }
+
+    function handleBubbleDragStart(event, val) {
+      state.draggedBubbleValue = val;
+      event.dataTransfer.setData("text/plain", val);
+    }
+
+    function handleBubbleDrop(event, potKey) {
+      event.preventDefault();
+      document.getElementById(`pot-card-${potKey}`).classList.remove('drag-over');
+      const val = state.draggedBubbleValue || 25;
+      adjustPot(potKey, val);
+    }
+
+    function adjustPot(key, delta) {
+      const current = state.allocations[key] || 0;
+      const totalAllocated = Object.values(state.allocations).reduce((a, b) => a + b, 0);
+      const unallocated = state.baseline.surplus - totalAllocated;
+
+      if (delta > 0 && unallocated < delta) {
+        delta = Math.max(0, unallocated);
+      }
+
+      state.allocations[key] = Math.max(0, current + delta);
+      updatePlanCalculations();
+    }
+
+    function autoDistributePool() {
+      const surplus = state.baseline.surplus;
+      if (surplus <= 0) return;
+
+      state.allocations.safety = Math.round(surplus * 0.25);
+      state.allocations.isa = Math.round(surplus * 0.25);
+      state.allocations.pension = Math.round(surplus * 0.15);
+      state.allocations.investment = Math.round(surplus * 0.15);
+      state.allocations.incomeAsset = Math.round(surplus * 0.10);
+      state.allocations.highRisk = Math.round(surplus * 0.10);
+
+      updatePlanCalculations();
+    }
+
+    function resetAllocations() {
+      Object.keys(state.allocations).forEach(k => state.allocations[k] = 0);
+      updatePlanCalculations();
+    }
+
+    function quickAddChip(amount) {
+      const totalAllocated = Object.values(state.allocations).reduce((a, b) => a + b, 0);
+      const unallocated = state.baseline.surplus - totalAllocated;
+
+      if (unallocated < amount) {
+        alert("Your available monthly pool is full! Adjust other pots or increase baseline income.");
+        return;
+      }
+
+      state.allocations.isa += amount;
+      updatePlanCalculations();
+    }
+
+    // MOBILE TOUCH BOTTOM SHEET FOR POTS
+    function openPotSheet(key) {
+      state.activeTouchPotKey = key;
+      const pot = POT_META[key];
+      const val = state.allocations[key] || 0;
+
+      document.getElementById('sheet-pot-icon').innerText = pot.icon;
+      document.getElementById('sheet-pot-name').innerText = pot.name;
+      document.getElementById('sheet-pot-desc').innerText = pot.desc;
+      document.getElementById('sheet-pot-val').innerText = `£${val}/mo`;
+
+      const slider = document.getElementById('sheet-pot-slider');
+      slider.max = Math.max(2000, state.baseline.surplus);
+      slider.value = val;
+
+      document.getElementById('pot-touch-sheet').classList.remove('hidden');
+    }
+
+    function closePotSheet() {
+      document.getElementById('pot-touch-sheet').classList.add('hidden');
+      state.activeTouchPotKey = null;
+    }
+
+    function syncSheetPotSlider() {
+      if (!state.activeTouchPotKey) return;
+      const val = parseInt(document.getElementById('sheet-pot-slider').value) || 0;
+      const key = state.activeTouchPotKey;
+
+      const current = state.allocations[key] || 0;
+      const totalAllocated = Object.values(state.allocations).reduce((a,b)=>a+b, 0) - current;
+      const available = state.baseline.surplus - totalAllocated;
+
+      const finalVal = Math.min(val, available);
+      state.allocations[key] = finalVal;
+      document.getElementById('sheet-pot-val').innerText = `£${finalVal}/mo`;
+      document.getElementById('sheet-pot-slider').value = finalVal;
+
+      updatePlanCalculations();
+    }
+
+    function adjustSheetPotAmount(delta) {
+      if (!state.activeTouchPotKey) return;
+      adjustPot(state.activeTouchPotKey, delta);
+      const newVal = state.allocations[state.activeTouchPotKey];
+      document.getElementById('sheet-pot-val').innerText = `£${newVal}/mo`;
+      document.getElementById('sheet-pot-slider').value = newVal;
+    }
+
+    // DYNAMIC CUSTOM ASSETS MANAGEMENT
+    function promptAddCustomAsset() {
+      const name = prompt("Enter asset title (e.g. 'A - Tech Share', 'B - Stocks ISA', 'C - Rental Car'):", "D - Freelance Venture");
+      if (!name) return;
+
+      const newAsset = {
+        id: `custom_${Date.now()}`,
+        name: name,
+        potKey: "highRisk",
+        startingAmt: 1000,
+        monthlyContrib: 50,
+        actualGrowthPct: 5,
+        actualMonthlyIncome: 0,
+        monthlyCosts: 0,
+        downtimeMonths: 0,
+        lowAssumptionPct: -5,
+        expAssumptionPct: 8,
+        highAssumptionPct: 15
+      };
+
+      state.customAssets.push(newAsset);
+      renderCustomAssetCards();
+      renderCustomAssetLabels();
+      updatePlanCalculations();
+    }
+
+    function renderCustomAssetCards() {
+      const container = document.getElementById('custom-assets-list');
+      if (!container) return;
+      container.innerHTML = "";
+
+      state.customAssets.forEach((asset, idx) => {
+        const card = document.createElement('div');
+        card.className = "p-4 rounded-xl bg-[#F8E1D9]/40 border border-[#B68A55]/30 space-y-3";
+        card.innerHTML = `
+          <div class="flex justify-between items-center border-b border-[#EBC7B9] pb-2">
+            <div class="flex items-center space-x-2">
+              <span class="font-serif font-bold text-sm text-[#5A1730]">${asset.name}</span>
+              <span class="text-[10px] bg-[#5A1730] text-amber-100 px-2 py-0.5 rounded-full font-bold">${POT_META[asset.potKey]?.name || 'Asset'}</span>
+            </div>
+            <button onclick="removeCustomAsset(${idx})" class="text-xs text-rose-700 hover:underline font-bold">Remove</button>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <div>
+              <label class="text-[10px] text-[#936164] font-bold block">Group Pot</label>
+              <select onchange="updateCustomAssetProp(${idx}, 'potKey', this.value)" class="w-full p-1 bg-white border border-[#B68A55]/30 rounded text-xs">
+                <option value="safety" ${asset.potKey==='safety'?'selected':''}>Safety Savings</option>
+                <option value="isa" ${asset.potKey==='isa'?'selected':''}>ISA Growth</option>
+                <option value="pension" ${asset.potKey==='pension'?'selected':''}>Pension</option>
+                <option value="investment" ${asset.potKey==='investment'?'selected':''}>Investment</option>
+                <option value="incomeAsset" ${asset.potKey==='incomeAsset'?'selected':''}>Income Asset</option>
+                <option value="highRisk" ${asset.potKey==='highRisk'?'selected':''}>Higher-Risk Growth</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="text-[10px] text-[#936164] font-bold block">Starting Value (£)</label>
+              <input type="number" value="${asset.startingAmt}" oninput="updateCustomAssetProp(${idx}, 'startingAmt', parseFloat(this.value)||0)" class="w-full p-1 bg-white border border-[#B68A55]/30 rounded text-xs">
+            </div>
+
+            <div>
+              <label class="text-[10px] text-[#936164] font-bold block">Monthly Contrib (£)</label>
+              <input type="number" value="${asset.monthlyContrib}" oninput="updateCustomAssetProp(${idx}, 'monthlyContrib', parseFloat(this.value)||0)" class="w-full p-1 bg-white border border-[#B68A55]/30 rounded text-xs">
+            </div>
+
+            <div>
+              <label class="text-[10px] text-[#936164] font-bold block">Review Growth %</label>
+              <input type="number" value="${asset.actualGrowthPct}" oninput="updateCustomAssetProp(${idx}, 'actualGrowthPct', parseFloat(this.value)||0)" class="w-full p-1 bg-white border border-[#B68A55]/30 rounded text-xs">
+            </div>
+
+            <div>
+              <label class="text-[10px] text-[#936164] font-bold block">Monthly Yield (£)</label>
+              <input type="number" value="${asset.actualMonthlyIncome}" oninput="updateCustomAssetProp(${idx}, 'actualMonthlyIncome', parseFloat(this.value)||0)" class="w-full p-1 bg-white border border-[#B68A55]/30 rounded text-xs">
+            </div>
+
+            <div>
+              <label class="text-[10px] text-[#936164] font-bold block">Monthly Costs (£)</label>
+              <input type="number" value="${asset.monthlyCosts}" oninput="updateCustomAssetProp(${idx}, 'monthlyCosts', parseFloat(this.value)||0)" class="w-full p-1 bg-white border border-[#B68A55]/30 rounded text-xs">
+            </div>
+
+            <div>
+              <label class="text-[10px] text-[#936164] font-bold block">Downtime (Months)</label>
+              <input type="number" value="${asset.downtimeMonths}" oninput="updateCustomAssetProp(${idx}, 'downtimeMonths', parseInt(this.value)||0)" class="w-full p-1 bg-white border border-[#B68A55]/30 rounded text-xs">
+            </div>
+
+            <div>
+              <label class="text-[10px] text-[#936164] font-bold block">Exp Return % / Yr</label>
+              <input type="number" value="${asset.expAssumptionPct}" oninput="updateCustomAssetProp(${idx}, 'expAssumptionPct', parseFloat(this.value)||0)" class="w-full p-1 bg-white border border-[#B68A55]/30 rounded text-xs">
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function updateCustomAssetProp(idx, prop, val) {
+      if (state.customAssets[idx]) {
+        state.customAssets[idx][prop] = val;
+        renderCustomAssetLabels();
+        updatePlanCalculations();
+      }
+    }
+
+    function removeCustomAsset(idx) {
+      state.customAssets.splice(idx, 1);
+      renderCustomAssetCards();
+      renderCustomAssetLabels();
+      updatePlanCalculations();
+    }
+
+    function renderCustomAssetLabels() {
+      Object.keys(POT_META).forEach(key => {
+        const wrap = document.getElementById(`pot-labels-${key}`);
+        if (!wrap) return;
+        wrap.innerHTML = "";
+        const items = state.customAssets.filter(a => a.potKey === key);
+        items.forEach(item => {
+          const span = document.createElement('span');
+          span.className = "px-2 py-0.5 bg-[#EBC7B9]/60 text-[#5A1730] font-bold rounded-full border border-[#B68A55]/30";
+          span.innerText = item.name;
+          wrap.appendChild(span);
+        });
+      });
+    }
+
+    // SHARED MATHEMATICAL SIMULATION ENGINE
+    function simulatePortfolio(monthsTarget, scenarioMode = 'expected', scenarioOverride = null) {
+      let activeScenario = scenarioOverride || state.activeScenario || 'baseline';
+      
+      let totalLump = state.baseline.lumpSum;
+      let monthAlloc = { ...state.allocations };
+      let monthlySurplus = state.baseline.surplus;
+
+      // Handle Scenario Effects on Cash & Allocations
+      if (activeScenario === 'repair') {
+        totalLump = Math.max(0, totalLump - 1200);
+      } else if (activeScenario === 'cost_of_living') {
+        const totalAlloc = Object.values(monthAlloc).reduce((a, b) => a + b, 0);
+        if (totalAlloc > 0) {
+          const reduction = Math.min(200, totalAlloc);
+          const ratio = (totalAlloc - reduction) / totalAlloc;
+          Object.keys(monthAlloc).forEach(k => {
+            monthAlloc[k] = Math.round(monthAlloc[k] * ratio);
+          });
+        }
+      } else if (activeScenario === 'income_up' || activeScenario === 'side_hustle') {
+        const boost = (activeScenario === 'income_up') ? 400 : 250;
+        const totalAlloc = Object.values(monthAlloc).reduce((a, b) => a + b, 0);
+        if (totalAlloc > 0) {
+          const ratio = (totalAlloc + boost) / totalAlloc;
+          Object.keys(monthAlloc).forEach(k => {
+            monthAlloc[k] = Math.round(monthAlloc[k] * ratio);
+          });
+        }
+      }
+
+      // Calculate Custom Assets Value over target months
+      let customAssetsTotal = 0;
+      state.customAssets.forEach(asset => {
+        // ONE-OFF RECORDED PERFORMANCE ADJUSTMENT
+        let reviewedStartingValue = asset.startingAmt * (1 + (asset.actualGrowthPct || 0) / 100);
+        let assetVal = reviewedStartingValue;
+        let annualGrowth = asset.expAssumptionPct / 100;
+
+        if (scenarioMode === 'low') annualGrowth = asset.lowAssumptionPct / 100;
+        if (scenarioMode === 'high') annualGrowth = asset.highAssumptionPct / 100;
+
+        // Apply scenario multipliers
+        if (activeScenario === 'dip' && (asset.potKey === 'highRisk' || asset.potKey === 'isa' || asset.potKey === 'investment')) {
+          annualGrowth -= 0.15;
+        } else if (activeScenario === 'asset_growth') {
+          annualGrowth += 0.08;
+        }
+
+        let monthlyRate = annualGrowth / 12;
+
+        for (let m = 1; m <= monthsTarget; m++) {
+          let currentMonthlyContrib = asset.monthlyContrib;
+          if (activeScenario === 'career_break' && m <= 3) {
+            currentMonthlyContrib = 0;
+          }
+
+          assetVal = assetVal * (1 + monthlyRate) + currentMonthlyContrib;
+
+          let netYield = asset.actualMonthlyIncome - asset.monthlyCosts;
+          let isDowntime = (asset.downtimeMonths > 0 && m <= asset.downtimeMonths) || (activeScenario === 'asset_down' && m <= 2);
+          if (isDowntime) {
+            netYield = -asset.monthlyCosts; // Yield lost during downtime
+          }
+          assetVal += netYield;
+        }
+        customAssetsTotal += Math.max(0, assetVal);
+      });
+
+      // Calculate Core Pots Value over target months
+      let potsVal = totalLump;
+      const totalMonthlyAlloc = Object.values(monthAlloc).reduce((a, b) => a + b, 0);
+
+      let potReturnRate = 0.003;
+      if (totalMonthlyAlloc > 0) {
+        let weighted = (
+          (monthAlloc.safety * 0.0015) +
+          (monthAlloc.debt * 0.004) +
+          (monthAlloc.isa * 0.0045) +
+          (monthAlloc.pension * 0.005) +
+          (monthAlloc.investment * 0.0055) +
+          (monthAlloc.incomeAsset * 0.006) +
+          (monthAlloc.business * 0.007) +
+          (monthAlloc.highRisk * 0.008)
+        ) / totalMonthlyAlloc;
+
+        if (scenarioMode === 'low') weighted *= 0.5;
+        if (scenarioMode === 'high') weighted *= 1.4;
+        potReturnRate = weighted;
+      }
+
+      for (let m = 1; m <= monthsTarget; m++) {
+        let currentMonthlyAlloc = totalMonthlyAlloc;
+        if (activeScenario === 'career_break' && m <= 3) {
+          currentMonthlyAlloc = 0;
+        }
+        potsVal = (potsVal + currentMonthlyAlloc) * (1 + potReturnRate);
+      }
+
+      return Math.round(potsVal + customAssetsTotal);
+    }
+
+    function calculateGoalDateText(targetAmount) {
+      let monthsNeeded = 0;
+      let val = simulatePortfolio(0, 'expected');
+
+      if (val >= targetAmount) {
+        return "Goal Achieved Today";
+      }
+
+      while (val < targetAmount && monthsNeeded < 360) {
+        monthsNeeded++;
+        val = simulatePortfolio(monthsNeeded, 'expected');
+      }
+
+      if (monthsNeeded >= 360) {
+        return "Not reached within 30-year period";
+      }
+
+      const currentDate = new Date();
+      currentDate.setMonth(currentDate.getMonth() + monthsNeeded);
+
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+    }
+
+    function updatePlanCalculations() {
+      const surplus = state.baseline.surplus;
+      const totalAllocated = Object.values(state.allocations).reduce((a, b) => a + b, 0);
+      const unallocated = Math.max(0, surplus - totalAllocated);
+
+      document.getElementById('pool-unallocated-text').innerText = `£${unallocated.toLocaleString()} / mo`;
+
+      // Update Pot Liquid Height Bars
+      Object.keys(POT_META).forEach(key => {
+        const val = state.allocations[key] || 0;
+        const textEl = document.getElementById(`pot-val-text-${key}`);
+        const barEl = document.getElementById(`pot-bar-${key}`);
+        if (textEl) textEl.innerText = `£${val}/mo`;
+
+        if (barEl) {
+          const pct = surplus > 0 ? Math.min(100, Math.round((val / surplus) * 100)) : 0;
+          barEl.style.width = `${pct}%`;
+        }
+      });
+
+      // Calculate Real Goal Dates & Metrics
+      const goalAmt = state.goal.amount;
+      const dateStr = calculateGoalDateText(goalAmt);
+
+      document.getElementById('dash-goal-date').innerText = dateStr;
+      document.getElementById('timeline-target-date-text').innerText = `Estimated Goal: ${dateStr}`;
+      document.getElementById('timeline-target-val-text').innerText = `Target: £${goalAmt.toLocaleString()}`;
+
+      let timelinePct = 50;
+      if (dateStr.includes("Not reached")) {
+        timelinePct = 15;
+      } else if (dateStr.includes("Achieved")) {
+        timelinePct = 100;
+      }
+      document.getElementById('timeline-fill-bar').style.width = `${timelinePct}%`;
+
+      // Resilience
+      const safetyAmt = state.allocations.safety;
+      let resilience = "🛡️ Strong";
+      if (safetyAmt < surplus * 0.1 && state.baseline.emergencyLevel === "none") {
+        resilience = "⚠️ Vulnerable";
+      } else if (safetyAmt < surplus * 0.2) {
+        resilience = "⚖️ Moderate";
+      }
+      document.getElementById('dash-resilience').innerText = resilience;
+
+      // Volatility Risk Meter
+      const highRiskTotal = state.allocations.highRisk + state.allocations.business;
+      let riskLevel = "🟢 Low Risk";
+      if (highRiskTotal > totalAllocated * 0.4) {
+        riskLevel = "🔴 Higher Risk";
+      } else if (highRiskTotal > totalAllocated * 0.15) {
+        riskLevel = "🟡 Moderate";
+      }
+      document.getElementById('dash-risk').innerText = riskLevel;
+
+      // Concentration Risk
+      let maxPot = 0;
+      Object.values(state.allocations).forEach(v => { if (v > maxPot) maxPot = v; });
+      let conc = "🎯 Balanced";
+      if (totalAllocated > 0 && maxPot / totalAllocated > 0.6) {
+        conc = "⚠️ Concentrated";
+      }
+      document.getElementById('dash-concentration').innerText = conc;
+
+      // Access
+      const easyCash = state.allocations.safety + state.allocations.isa + state.allocations.goalPot;
+      let access = "🔓 Easy";
+      if (easyCash < totalAllocated * 0.3) access = "🔒 Restricted";
+      document.getElementById('dash-access').innerText = access;
+
+      // Allocation Pct
+      const pctAlloc = surplus > 0 ? Math.round((totalAllocated / surplus) * 100) : 0;
+      document.getElementById('dash-allocated-pct').innerText = `${pctAlloc}% Allocated`;
+
+      // Momentum Score
+      let score = 50;
+      if (pctAlloc >= 90) score += 20;
+      if (resilience.includes("Strong")) score += 15;
+      if (conc.includes("Balanced")) score += 10;
+      if (!dateStr.includes("Not reached")) score += 15;
+      score = Math.min(98, Math.max(25, score));
+      document.getElementById('momentum-score-val').innerText = `${score} / 100`;
+    }
+
+    // STEP 5: REAL SCENARIO TESTING ENGINE
+    function runScenario(type) {
+      state.activeScenario = type;
+
+      const titleEl = document.getElementById('scen-title');
+      const descEl = document.getElementById('scen-desc');
+      const pillEl = document.getElementById('scen-status-pill');
+
+      const targetMonths = state.goal.timelineMonths;
+
+      if (type === 'dip') {
+        titleEl.innerText = "Scenario: Market Dip (-15%)";
+        descEl.innerText = "Temporary pullback in growth assets. Evaluates how safety savings protect your timeline.";
+        pillEl.innerText = "Volatile Conditions";
+        pillEl.className = "px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full";
+      } else if (type === 'repair') {
+        titleEl.innerText = "Scenario: £1,200 Urgent Repair";
+        descEl.innerText = "An unexpected expense requires immediate cash drawdown from Safety Savings.";
+        pillEl.innerText = "Cash Strain";
+        pillEl.className = "px-3 py-1 bg-rose-100 text-rose-800 text-xs font-bold rounded-full";
+      } else if (type === 'cost_of_living') {
+        titleEl.innerText = "Scenario: Cost of Living (+£200/mo)";
+        descEl.innerText = "Essential monthly spend increases, reducing monthly surplus available to allocate.";
+        pillEl.innerText = "Reduced Surplus";
+        pillEl.className = "px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full";
+      } else if (type === 'career_break') {
+        titleEl.innerText = "Scenario: 3-Month Career Break";
+        descEl.innerText = "Income pauses temporarily. Your Safety Savings cushion covers essential expenses.";
+        pillEl.innerText = "Buffer Test";
+        pillEl.className = "px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full";
+      } else if (type === 'income_up') {
+        titleEl.innerText = "Scenario: Income Increase (+£400/mo)";
+        descEl.innerText = "Career progression boosts monthly surplus pool, accelerating momentum.";
+        pillEl.innerText = "Accelerated";
+        pillEl.className = "px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full";
+      } else if (type === 'asset_growth') {
+        titleEl.innerText = "Scenario: Stronger Asset Growth";
+        descEl.innerText = "Higher growth performance in investment and business assets boosts total outcome.";
+        pillEl.innerText = "High Yield";
+        pillEl.className = "px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full";
+      } else if (type === 'asset_down') {
+        titleEl.innerText = "Scenario: Asset Downtime";
+        descEl.innerText = "Income-generating assets experience unexpected repair costs or tenant downtime.";
+        pillEl.innerText = "Yield Drag";
+        pillEl.className = "px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full";
+      } else if (type === 'side_hustle') {
+        titleEl.innerText = "Scenario: Side Income (+£250/mo)";
+        descEl.innerText = "Secondary cash flow stream supplements monthly pool contributions consistently.";
+        pillEl.innerText = "Diversified Flow";
+        pillEl.className = "px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full";
+      }
+
+      // Calculate Scenarios via simulatePortfolio
+      const expectedCase = simulatePortfolio(targetMonths, 'expected', type);
+      const steadyCase = simulatePortfolio(targetMonths, 'low', type);
+      const difficultCase = Math.round(steadyCase * 0.88);
+
+      document.getElementById('scen-val-steady').innerText = `£${steadyCase.toLocaleString()}`;
+      document.getElementById('scen-val-expected').innerText = `£${expectedCase.toLocaleString()}`;
+      document.getElementById('scen-val-difficult').innerText = `£${difficultCase.toLocaleString()}`;
+    }
+
+    // STEP 6: QUARTERLY REVIEW DATA-DRIVEN TESTER
+    function renderQuarterlyReviewDeviations() {
+      const grid = document.getElementById('review-deviations-grid');
+      if (!grid) return;
+      grid.innerHTML = "";
+
+      state.customAssets.forEach(asset => {
+        const item = document.createElement('div');
+        item.className = "p-3.5 rounded-xl bg-[#FFFDFB] border border-[#B68A55]/30 space-y-1";
+
+        let statusText = `${asset.actualGrowthPct}% Growth`;
+        let statusClass = "text-emerald-700";
+        if (asset.actualGrowthPct < 0) statusClass = "text-rose-700";
+        if (asset.actualMonthlyIncome > 0) statusText = `£${asset.actualMonthlyIncome}/mo Net`;
+
+        let reviewedStartingVal = Math.round(asset.startingAmt * (1 + (asset.actualGrowthPct || 0) / 100));
+
+        item.innerHTML = `
+          <div class="flex justify-between text-xs font-bold text-[#5A1730]">
+            <span>${asset.name}</span>
+            <span class="${statusClass}">${statusText}</span>
+          </div>
+          <div class="text-[11px] text-[#794456]">Current value after review: <strong class="text-[#5A1730]">£${reviewedStartingVal.toLocaleString()}</strong></div>
+          <div class="text-[10px] text-[#936164]">Starting: £${asset.startingAmt.toLocaleString()} • Monthly: £${asset.monthlyContrib}/mo</div>
+        `;
+        grid.appendChild(item);
+      });
+
+      const assetA = state.customAssets[0] || { name: "Asset A", actualGrowthPct: 8 };
+      const assetC = state.customAssets[2] || { name: "Asset C", actualMonthlyIncome: 80 };
+      document.getElementById('review-neutral-insight-text').innerText =
+        `Your plan currently has higher exposure to ${assetA.name}. ${assetC.name} produced net yield of £${assetC.actualMonthlyIncome}/mo. Explore potential trade-offs below.`;
+    }
+
+    function backupAllocationsIfNeeded() {
+      if (!state.backupAllocations) {
+        state.backupAllocations = { ...state.allocations };
+      }
+    }
+
+    function revertReviewTest() {
+      if (state.backupAllocations) {
+        state.allocations = { ...state.backupAllocations };
+        state.backupAllocations = null;
+      }
+      document.getElementById('undo-test-btn').classList.add('hidden');
+      document.getElementById('test-shift-summary').classList.add('hidden');
+      updatePlanCalculations();
+      testReviewOption('keep');
+    }
+
+    function applyReviewTestAsNewPlan() {
+      state.backupAllocations = null;
+      document.getElementById('undo-test-btn').classList.add('hidden');
+      document.getElementById('test-shift-summary').classList.add('hidden');
+      alert("New illustrative allocation plan applied successfully!");
+      updatePlanCalculations();
+    }
+
+    function testReviewOption(opt) {
+      backupAllocationsIfNeeded();
+      state.allocations = { ...state.backupAllocations };
+
+      state.activeReviewOption = opt;
+      const titleEl = document.getElementById('tradeoff-title');
+      const textEl = document.getElementById('tradeoff-text');
+      const tagEl = document.getElementById('tradeoff-tag');
+      const shiftSummary = document.getElementById('test-shift-summary');
+      const shiftText = document.getElementById('test-shift-text');
+      const undoBtn = document.getElementById('undo-test-btn');
+
+      let shiftNotice = "";
+
+      if (opt === 'keep') {
+        titleEl.innerText = "Explore what could happen if you Keep Plan As Is";
+        textEl.innerText = "Potential benefit: Maintain current rhythm without operational changes. Potential trade-off: Concentration in top-performing assets increases naturally over time.";
+        tagEl.innerText = "Steady Path";
+        shiftSummary.classList.add('hidden');
+      } else if (opt === 'into_A') {
+        const availableToShift = Math.min(100, state.allocations.safety);
+        state.allocations.safety = Math.max(0, state.allocations.safety - availableToShift);
+        state.allocations.highRisk += availableToShift;
+        shiftNotice = `Illustrative Shift: £${availableToShift}/mo moved from Safety to Asset A Growth Pot`;
+
+        titleEl.innerText = "Explore what could happen if you Put Future Contributions Into A";
+        textEl.innerText = "Potential benefit: Accelerates compounding if Asset A continues outperforming. Potential trade-off: Higher concentration risk and lower resilience if Asset A pulls back.";
+        tagEl.innerText = "High Concentration";
+      } else if (opt === 'reduce_C') {
+        const availableToShift = Math.min(50, state.allocations.incomeAsset);
+        state.allocations.incomeAsset = Math.max(0, state.allocations.incomeAsset - availableToShift);
+        state.allocations.safety += availableToShift;
+        shiftNotice = `Illustrative Shift: £${availableToShift}/mo moved from Income Asset C to Safety Savings`;
+
+        titleEl.innerText = "Explore what could happen if you Reduce Allocations to C";
+        textEl.innerText = "Potential benefit: Frees up cash flow to reallocate into Safety or ISAs. Potential trade-off: Lowers income diversification from asset yields.";
+        tagEl.innerText = "Risk Reduction";
+      } else if (opt === 'move_safety') {
+        const availableToShift = Math.min(150, state.allocations.highRisk);
+        state.allocations.highRisk = Math.max(0, state.allocations.highRisk - availableToShift);
+        state.allocations.safety += availableToShift;
+        shiftNotice = `Illustrative Shift: £${availableToShift}/mo moved from Higher-Risk to Safety Savings`;
+
+        titleEl.innerText = "Explore what could happen if you Move Money Back to Safety Savings";
+        textEl.innerText = "Potential benefit: Strengthens emergency liquidity and resilience against shocks. Potential trade-off: Extends overall goal horizon slightly.";
+        tagEl.innerText = "High Security";
+      } else if (opt === 'diversify') {
+        const totalAlloc = Object.values(state.allocations).reduce((a,b)=>a+b, 0);
+        state.allocations.safety = Math.round(totalAlloc * 0.35);
+        state.allocations.isa = Math.round(totalAlloc * 0.35);
+        state.allocations.pension = Math.round(totalAlloc * 0.30);
+        state.allocations.highRisk = 0;
+        state.allocations.incomeAsset = 0;
+        shiftNotice = `Illustrative Shift: Re-spread total monthly pool evenly across Safety (35%), ISA (35%), and Pension (30%)`;
+
+        titleEl.innerText = "Explore what could happen if you Test a Diversified Mix";
+        textEl.innerText = "Potential benefit: Spreads risk smoothly across Safety, ISA, and Pension. Potential trade-off: Smoother growth with fewer extreme spikes.";
+        tagEl.innerText = "Balanced Stability";
+      } else if (opt === 'pause_risk') {
+        const pausedAmount = state.allocations.highRisk;
+        state.allocations.safety += pausedAmount;
+        state.allocations.highRisk = 0;
+        shiftNotice = `Illustrative Shift: Paused £${pausedAmount}/mo High-Risk contributions and directed to Safety Savings`;
+
+        titleEl.innerText = "Explore what could happen if you Pause High-Risk Contributions";
+        textEl.innerText = "Potential benefit: Protects cash flow from volatility during uncertain market quarters. Potential trade-off: Temporary pause on high potential yield.";
+        tagEl.innerText = "Cautious Buffer";
+      } else if (opt === 'extend_time') {
+        shiftNotice = "Illustrative Shift: Goal timeline extended by +12 months";
+        titleEl.innerText = "Explore what could happen if you Extend Your Goal Date";
+        textEl.innerText = "Potential benefit: Gives investments more time to compound without requiring higher monthly contributions. Potential trade-off: Target date moves further into future.";
+        tagEl.innerText = "Patience Strategy";
+      }
+
+      if (opt !== 'keep') {
+        undoBtn.classList.remove('hidden');
+        shiftSummary.classList.remove('hidden');
+        shiftText.innerText = shiftNotice;
+      }
+
+      updatePlanCalculations();
+
+      const targetMonths = state.goal.timelineMonths;
+      const difficultVal = simulatePortfolio(targetMonths, 'low');
+      const dateStr = calculateGoalDateText(state.goal.amount);
+
+      document.getElementById('tr-goal-date').innerText = dateStr;
+      document.getElementById('tr-difficult').innerText = `£${difficultVal.toLocaleString()}`;
+
+      const totalAllocated = Object.values(state.allocations).reduce((a, b) => a + b, 0);
+      let maxPot = 0;
+      Object.values(state.allocations).forEach(v => { if (v > maxPot) maxPot = v; });
+
+      document.getElementById('tr-conc').innerText = (totalAllocated > 0 && maxPot / totalAllocated > 0.5) ? "⚠️ High Concentration" : "🎯 Balanced";
+      document.getElementById('tr-access').innerText = (state.allocations.safety > totalAllocated * 0.3) ? "🔓 Easy Access" : "🔒 Restricted";
+    }
+
+    // STEP 7: BUILD FINAL MAP
+    function buildFinalMap() {
+      document.getElementById('res-goal-name').innerText = state.goal.title;
+      document.getElementById('res-goal-target').innerText = `Target: £${state.goal.amount.toLocaleString()}`;
+
+      const months = state.goal.timelineMonths;
+      const yrs = months >= 12 ? `${months/12} Years` : `${months} Months`;
+      document.getElementById('res-horizon').innerText = yrs;
+
+      const dateStr = calculateGoalDateText(state.goal.amount);
+      document.getElementById('res-target-date').innerText = `Est. Goal: ${dateStr}`;
+
+      const scoreText = document.getElementById('momentum-score-val').innerText;
+      document.getElementById('res-score').innerText = scoreText;
+
+      const listWrap = document.getElementById('res-allocation-list');
+      listWrap.innerHTML = "";
+      Object.keys(state.allocations).forEach(k => {
+        const val = state.allocations[k];
+        if (val > 0) {
+          const item = document.createElement('div');
+          item.className = "p-2 rounded-lg bg-[#EBC7B9]/30 text-xs border border-[#B68A55]/20 flex justify-between items-center";
+          item.innerHTML = `<span class="font-medium text-[#5A1730]">${POT_META[k].name}</span> <strong class="text-[#5A1730]">£${val}/mo</strong>`;
+          listWrap.appendChild(item);
+        }
+      });
+
+      const exp = simulatePortfolio(months, 'expected');
+      const steady = simulatePortfolio(months, 'low');
+      const diff = Math.round(steady * 0.88);
+
+      document.getElementById('res-val-steady').innerText = `£${steady.toLocaleString()}`;
+      document.getElementById('res-val-exp').innerText = `£${exp.toLocaleString()}`;
+      document.getElementById('res-val-diff').innerText = `£${diff.toLocaleString()}`;
+
+      const safetyAmt = state.allocations.safety;
+      if (safetyAmt > 0 || state.baseline.emergencyLevel === "3plus") {
+        document.getElementById('res-strongest').innerText = "You have established a strong safety buffer, providing peace of mind and resilience against life shocks.";
+      } else {
+        document.getElementById('res-strongest').innerText = "You have focused heavily on monthly surplus momentum to accelerate your target date.";
+      }
+
+      const totalMonthly = Object.values(state.allocations).reduce((a,b)=>a+b, 0);
+      if (state.allocations.highRisk > totalMonthly * 0.3) {
+        document.getElementById('res-risk').innerText = "Higher volatility allocations carry larger downside pullbacks. Balance with liquid safety cash.";
+      } else {
+        document.getElementById('res-risk').innerText = "Ensure inflation risk is managed if long-term funds remain heavily in low-yield cash options.";
+      }
+    }
+
+    // MODAL HANDLERS
+    function openSaveModal() {
+      document.getElementById('save-modal').classList.remove('hidden');
+    }
+    function closeSaveModal() {
+      document.getElementById('save-modal').classList.add('hidden');
+      document.getElementById('modal-feedback').classList.add('hidden');
+    }
+    function submitSavePlan() {
+      const email = document.getElementById('modal-email').value;
+      if (!email || !email.includes('@')) {
+        alert("Please enter a valid email address.");
+        return;
+      }
+      document.getElementById('modal-feedback').classList.remove('hidden');
+      setTimeout(() => {
+        closeSaveModal();
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
